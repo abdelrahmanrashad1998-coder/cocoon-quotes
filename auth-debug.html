@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Authentication Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body>
+    <h1>🔍 Authentication Debug</h1>
+    <p>This page helps debug authentication issues that might be causing redirects to login.</p>
+    
+    <div id="status-container">
+        <div class="status-box warning">
+            <strong>Checking authentication...</strong><br>
+            Please wait while we debug your authentication status.
+        </div>
+    </div>
+    
+    <div id="actions" style="display: none;">
+        <h2>Debug Actions</h2>
+        <button class="btn btn-success" onclick="testUserManagementAccess()">Test User Management Access</button>
+        <button class="btn" onclick="checkAuthState()">Check Auth State</button>
+        <button class="btn" onclick="checkUserRole()">Check User Role</button>
+        <button class="btn" onclick="testPermissions()">Test Permissions</button>
+        <a href="admin.html" class="btn">Go to User Management</a>
+        <a href="dashboard.html" class="btn">Go to Dashboard</a>
+    </div>
+    
+    <div id="debug-info" class="debug-info" style="display: none;">
+        <h3>Debug Information</h3>
+        <div id="debug-content"></div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let userRole = 'user';
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await runAuthDebug();
+        });
+        
+        async function runAuthDebug() {
+            const container = document.getElementById('status-container');
+            container.innerHTML = '';
+            
+            // Test 1: Firebase Initialization
+            try {
+                addStatus('info', '🔄 Initializing Firebase Auth...', 'Setting up authentication system...');
+                await FirebaseAuth.initializeAuth();
+                addStatus('success', '✅ Firebase Auth Initialized', 'Authentication system is working.');
+            } catch (error) {
+                addStatus('error', '❌ Firebase Auth Failed', error.message);
+                return;
+            }
+            
+            // Test 2: Check Authentication State
+            const isAuthenticated = FirebaseAuth.isAuthenticated();
+            addStatus('info', '🔍 Checking Authentication State', `isAuthenticated(): ${isAuthenticated}`);
+            
+            if (!isAuthenticated) {
+                addStatus('error', '❌ Not Authenticated', 'User is not authenticated. This is why you\'re being redirected to login.');
+                showActions();
+                return;
+            }
+            
+            // Test 3: Get Current User
+            currentUser = FirebaseAuth.getCurrentUser();
+            if (!currentUser) {
+                addStatus('error', '❌ No Current User', 'isAuthenticated() returned true but getCurrentUser() returned null.');
+                showActions();
+                return;
+            }
+            
+            addStatus('success', '✅ User Authenticated', `Logged in as: ${currentUser.email}`);
+            
+            // Test 4: Get User Role
+            await getUserRole();
+            
+            // Test 5: Check Permissions
+            await checkPermissions();
+            
+            showActions();
+        }
+        
+        async function getUserRole() {
+            try {
+                addStatus('info', '🔍 Getting User Role...', 'Checking user role from database...');
+                
+                const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    userRole = userDoc.data().role || 'user';
+                    addStatus('success', '✅ User Role Retrieved', `Your role is: ${userRole}`);
+                } else {
+                    addStatus('warning', '⚠️ No User Profile', 'User profile not found in database. Using default role: user');
+                }
+            } catch (error) {
+                addStatus('error', '❌ Role Check Failed', error.message);
+            }
+        }
+        
+        async function checkPermissions() {
+            try {
+                addStatus('info', '🔍 Checking Permissions...', 'Verifying admin permissions...');
+                
+                const hasPermission = await SecurityManager.hasPermission('manage_users');
+                addStatus('info', '📋 Permission Check', `Has manage_users permission: ${hasPermission}`);
+                
+                if (hasPermission) {
+                    addStatus('success', '✅ Admin Permissions Confirmed', 'You have admin permissions. User Management should be accessible.');
+                } else {
+                    addStatus('warning', '⚠️ No Admin Permissions', 'You do not have admin permissions. This might cause access issues.');
+                }
+                
+            } catch (error) {
+                addStatus('error', '❌ Permission Check Failed', error.message);
+            }
+        }
+        
+        async function testUserManagementAccess() {
+            try {
+                addStatus('info', '🔄 Testing User Management Access...', 'Attempting to access user management...');
+                
+                // Try to open user management in new window
+                const newWindow = window.open('admin.html', '_blank');
+                
+                if (newWindow) {
+                    addStatus('success', '✅ User Management Opened', 'User Management page opened in new window. Check if it loads properly.');
+                } else {
+                    addStatus('warning', '⚠️ Popup Blocked', 'Please allow popups and try again.');
+                }
+                
+            } catch (error) {
+                addStatus('error', '❌ Access Test Failed', error.message);
+            }
+        }
+        
+        async function checkAuthState() {
+            const debugContent = document.getElementById('debug-content');
+            const debugInfo = document.getElementById('debug-info');
+            
+            let debugHtml = '<h4>Authentication State Debug:</h4>';
+            debugHtml += `<p><strong>Firebase Auth Initialized:</strong> ${typeof FirebaseAuth !== 'undefined'}</p>`;
+            debugHtml += `<p><strong>isAuthenticated():</strong> ${FirebaseAuth.isAuthenticated()}</p>`;
+            debugHtml += `<p><strong>getCurrentUser():</strong> ${currentUser ? currentUser.email : 'null'}</p>`;
+            debugHtml += `<p><strong>User Role:</strong> ${userRole}</p>`;
+            debugHtml += `<p><strong>localStorage loggedIn:</strong> ${localStorage.getItem('loggedIn')}</p>`;
+            debugHtml += `<p><strong>localStorage currentUser:</strong> ${localStorage.getItem('currentUser')}</p>`;
+            
+            if (currentUser) {
+                debugHtml += '<h4>Current User Details:</h4>';
+                debugHtml += `<p><strong>UID:</strong> ${currentUser.uid}</p>`;
+                debugHtml += `<p><strong>Email:</strong> ${currentUser.email}</p>`;
+                debugHtml += `<p><strong>Display Name:</strong> ${currentUser.displayName || 'Not set'}</p>`;
+                debugHtml += `<p><strong>Email Verified:</strong> ${currentUser.emailVerified}</p>`;
+            }
+            
+            debugContent.innerHTML = debugHtml;
+            debugInfo.style.display = 'block';
+        }
+        
+        async function checkUserRole() {
+            try {
+                addStatus('info', '🔄 Checking User Role in Database...', 'Fetching user profile...');
+                
+                const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    addStatus('success', '✅ User Profile Found', `
+                        Role: ${userData.role || 'user'}<br>
+                        Created: ${new Date(userData.createdAt).toLocaleDateString()}<br>
+                        Active: ${userData.isActive ? 'Yes' : 'No'}
+                    `);
+                } else {
+                    addStatus('warning', '⚠️ No User Profile', 'User profile not found in database. This might cause permission issues.');
+                }
+                
+            } catch (error) {
+                addStatus('error', '❌ User Role Check Failed', error.message);
+            }
+        }
+        
+        async function testPermissions() {
+            try {
+                addStatus('info', '🔄 Testing All Permissions...', 'Checking all available permissions...');
+                
+                const permissions = ['read', 'write', 'delete', 'manage_users', 'manage_profiles', 'view_analytics'];
+                const results = [];
+                
+                for (const permission of permissions) {
+                    try {
+                        const hasPermission = await SecurityManager.hasPermission(permission);
+                        results.push(`${permission}: ${hasPermission ? '✅' : '❌'}`);
+                    } catch (error) {
+                        results.push(`${permission}: ❌ (Error: ${error.message})`);
+                    }
+                }
+                
+                addStatus('info', '📋 Permission Results', results.join('<br>'));
+                
+            } catch (error) {
+                addStatus('error', '❌ Permission Test Failed', error.message);
+            }
+        }
+        
+        function addStatus(type, title, message) {
+            const container = document.getElementById('status-container');
+            const statusBox = document.createElement('div');
+            statusBox.className = `status-box ${type}`;
+            statusBox.innerHTML = `<strong>${title}</strong><br>${message}`;
+            container.appendChild(statusBox);
+        }
+        
+        function showActions() {
+            document.getElementById('actions').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

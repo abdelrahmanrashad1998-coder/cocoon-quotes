@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://db.onlinewebfonts.com/c/28c0ba929947563500b21da15a88c6fe?family=TacticSans-Reg" rel="stylesheet"/>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Cocoon Aluminum Works - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    
+    <style>
+        :root {
+            --cocoon-primary: #A72036;
+            --cocoon-dark: #303038;
+            --cocoon-light: #F9BC77;
+            --cocoon-white: #FFFFFF;
+            --cocoon-light-bg: #f8f8f8;
+        }
+        body {
+            background-color: var(--cocoon-light-bg);
+            color: var(--cocoon-dark);
+            font-family: "TacticSans-Reg", sans-serif;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: var(--cocoon-white);
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+            border-top: 4px solid var(--cocoon-primary);
+        }
+        .logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: var(--cocoon-primary);
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--cocoon-dark);
+            font-size: 0.95rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: "TacticSans-Reg", sans-serif;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            border-color: var(--cocoon-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(167, 32, 54, 0.2);
+        }
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: "TacticSans-Reg", sans-serif;
+            width: 100%;
+        }
+        .btn-primary {
+            background: var(--cocoon-primary);
+            color: var(--cocoon-white);
+        }
+        .btn-primary:hover {
+            background: #8a1a2c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(167, 32, 54, 0.3);
+        }
+        .error-message {
+            color: var(--cocoon-primary);
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .loading-spinner {
+            display: none;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--cocoon-primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status-message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .retry-button {
+            background: var(--cocoon-light);
+            color: var(--cocoon-dark);
+            border: 2px solid var(--cocoon-primary);
+            margin-top: 10px;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+        .retry-button:hover {
+            background: var(--cocoon-primary);
+            color: var(--cocoon-white);
+        }
+        
+        .form-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .form-links a {
+            color: var(--cocoon-primary);
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 0.9rem;
+        }
+        
+        .form-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: var(--cocoon-white);
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .debug-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.8rem;
+            color: #495057;
+            display: none;
+        }
+        .debug-info.show {
+            display: block;
+        }
+        .debug-info h4 {
+            margin: 0 0 8px 0;
+            color: var(--cocoon-primary);
+            font-size: 0.9rem;
+        }
+        .debug-info ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+        .connection-status.connected {
+            background: #28a745;
+        }
+        .connection-status.connecting {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="connection-status" id="connection-status" title="Connection Status"></div>
+        <img alt="Cocoon Logo" class="logo" src="https://img1.wsimg.com/isteam/ip/b11b2784-66bc-4ac4-9b05-6ba6d416d22d/Untitled%20design%20(1).jpg"/>
+        <h2>Login to Dashboard</h2>
+        
+        <div class="loading-spinner" id="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading user data...</p>
+        </div>
+        
+        <div class="status-message" id="status-message"></div>
+        
+        <div class="debug-info" id="debug-info">
+            <h4>Debug Information</h4>
+            <div id="debug-content"></div>
+        </div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="login-btn">Login</button>
+            <button type="button" class="btn retry-button" id="retry-btn" style="display: none;">Retry Connection</button>
+            <p class="error-message" id="login-error">Invalid email or password.</p>
+            <div class="form-links">
+                <a href="#" id="forgot-password-link">Forgot Password?</a>
+                <a href="#" id="create-account-link">Create Account</a>
+            </div>
+        </form>
+        
+        <!-- Create Account Form (Hidden by default) -->
+        <form id="create-account-form" style="display: none;">
+            <div class="form-group">
+                <label for="new-email">Email</label>
+                <input type="email" id="new-email" class="form-control" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="display-name">Display Name</label>
+                <input type="text" id="display-name" class="form-control" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="new-password">Password</label>
+                <input type="password" id="new-password" class="form-control" placeholder="Enter password (min 6 characters)" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" class="form-control" placeholder="Confirm password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="create-account-btn">Create Account</button>
+            <button type="button" class="btn btn-secondary" id="back-to-login-btn">Back to Login</button>
+            <p class="error-message" id="create-account-error"></p>
+        </form>
+        
+        <!-- Forgot Password Form (Hidden by default) -->
+        <form id="forgot-password-form" style="display: none;">
+            <div class="form-group">
+                <label for="reset-email">Email</label>
+                <input type="email" id="reset-email" class="form-control" placeholder="Enter your email" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="reset-password-btn">Reset Password</button>
+            <button type="button" class="btn btn-secondary" id="back-to-login-from-reset-btn">Back to Login</button>
+            <p class="error-message" id="reset-password-error"></p>
+        </form>
+    </div>
+
+<script>
+    // Firebase Authentication
+    let users = [];
+    let isLoading = false;
+    let connectionAttempts = 0;
+    const MAX_RETRY_ATTEMPTS = 3;
+
+    // UI Helper Functions
+    function showStatus(message, type = 'error') {
+        const statusElement = document.getElementById('status-message');
+        statusElement.textContent = message;
+        statusElement.className = `status-message status-${type}`;
+        statusElement.style.display = 'block';
+    }
+
+    function hideStatus() {
+        document.getElementById('status-message').style.display = 'none';
+    }
+
+    function showLoading(show = true) {
+        document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
+        document.getElementById('login-btn').disabled = show;
+        isLoading = show;
+    }
+
+    function updateConnectionStatus(status) {
+        const connectionElement = document.getElementById('connection-status');
+        connectionElement.className = `connection-status ${status}`;
+        
+        const titles = {
+            'connected': 'Connected to Google Sheets',
+            'connecting': 'Connecting to Google Sheets...',
+            '': 'Connection Failed'
+        };
+        connectionElement.title = titles[status] || 'Connection Failed';
+    }
+
+    function showRetryButton(show = true) {
+        document.getElementById('retry-btn').style.display = show ? 'inline-block' : 'none';
+    }
+
+    function showDebugInfo(detectedColumns, usernameCol, passwordCol, colMap) {
+        const debugElement = document.getElementById('debug-info');
+        const debugContent = document.getElementById('debug-content');
+        
+        let debugHtml = `
+            <p><strong>Detected Columns:</strong> ${detectedColumns.join(', ')}</p>
+            <p><strong>Username Column Found:</strong> ${usernameCol || 'None'}</p>
+            <p><strong>Password Column Found:</strong> ${passwordCol || 'None'}</p>
+            <p><strong>Column Mapping:</strong></p>
+            <ul>
+        `;
+        
+        Object.keys(colMap).forEach(key => {
+            debugHtml += `<li>${key} → Column ${colMap[key]}</li>`;
+        });
+        
+        debugHtml += '</ul>';
+        debugContent.innerHTML = debugHtml;
+        debugElement.classList.add('show');
+    }
+
+    function hideDebugInfo() {
+        document.getElementById('debug-info').classList.remove('show');
+    }
+
+    // Enhanced error handling with specific error types
+    function handleLoadError(error, response = null) {
+        console.error('Error loading users:', error);
+        connectionAttempts++;
+        
+        let errorMessage = '';
+        let errorType = 'error';
+        
+        // Check for CORS errors first (most common issue)
+        if (error.message && (error.message.includes('CORS') || error.message.includes('blocked by CORS policy'))) {
+            errorMessage = 'CORS Error: Google Sheet access blocked. The sheet needs to be publicly accessible or have proper CORS settings.';
+        } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            // This is typically a CORS or network connectivity issue
+            if (!navigator.onLine) {
+                errorMessage = 'No internet connection detected. Please check your network and try again.';
+            } else {
+                errorMessage = 'Unable to access Google Sheet. This is likely due to CORS restrictions or the sheet not being publicly accessible.';
+            }
+        } else if (!navigator.onLine) {
+            errorMessage = 'No internet connection detected. Please check your network and try again.';
+        } else if (response && response.status === 403) {
+            errorMessage = 'Access denied to Google Sheet. Please ensure the sheet is publicly viewable.';
+        } else if (response && response.status === 404) {
+            errorMessage = 'Google Sheet not found. Please check the Sheet ID configuration.';
+        } else if (error.message && error.message.includes('Required columns')) {
+            errorMessage = 'Sheet structure error: Missing required columns (username, password).';
+        } else if (error.name === 'SyntaxError') {
+            errorMessage = 'Data format error: Invalid response from Google Sheets.';
+        } else if (error.message && error.message.includes('Invalid sheet structure')) {
+            errorMessage = 'Sheet structure error: The Google Sheet appears to be empty or improperly formatted.';
+        } else if (error.message && error.message.includes('No internet connection available')) {
+            errorMessage = 'No internet connection available. Please check your network settings.';
+        } else {
+            // Generic fallback with more helpful context
+            errorMessage = `Connection failed: ${error.message || 'Unknown error occurred'}. Please check your internet connection and sheet accessibility.`;
+        }
+        
+        showStatus(errorMessage, errorType);
+        updateConnectionStatus('');
+        showRetryButton(connectionAttempts < MAX_RETRY_ATTEMPTS);
+        
+        // Log detailed error information for debugging
+        console.error('Detailed error info:', {
+            errorName: error.name,
+            errorMessage: error.message,
+            errorStack: error.stack,
+            attempts: connectionAttempts,
+            online: navigator.onLine,
+            responseStatus: response?.status,
+            responseStatusText: response?.statusText,
+            userAgent: navigator.userAgent
+        });
+    }
+
+    async function testConnection() {
+        try {
+            updateConnectionStatus('connecting');
+            const testUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/edit`;
+            const response = await fetch(testUrl, { method: 'HEAD', mode: 'no-cors' });
+            return true;
+        } catch (error) {
+            console.warn('Connection test failed:', error);
+            return false;
+        }
+    }
+
+    async function loadUsers() {
+        if (isLoading) return;
+        
+        showLoading(true);
+        hideStatus();
+        hideDebugInfo();
+        updateConnectionStatus('connecting');
+        
+        try {
+            console.log('Loading users from Firebase...');
+            
+            // Check if Firebase is available
+            if (!FirebaseDB || !FirebaseDB.Users) {
+                throw new Error('Firebase not initialized. Please check your configuration.');
+            }
+            
+            // Load users from Firebase
+            users = await FirebaseDB.Users.loadUsers();
+            
+            console.log('Successfully loaded users:', users.length);
+            
+            if (users.length === 0) {
+                showStatus('No users found in Firebase. Please add users to the database.', 'warning');
+                updateConnectionStatus('');
+            } else {
+                showStatus(`Successfully loaded ${users.length} user(s) from Firebase.`, 'success');
+                updateConnectionStatus('connected');
+                hideStatus(); // Hide success message after 3 seconds
+                setTimeout(hideStatus, 3000);
+            }
+            
+            connectionAttempts = 0; // Reset attempts on success
+            showRetryButton(false);
+            
+        } catch (error) {
+            handleLoadError(error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Initialize Firebase Auth
+        try {
+            await FirebaseAuth.initializeAuth();
+            console.log('Firebase Auth initialized');
+        } catch (error) {
+            console.error('Error initializing Firebase Auth:', error);
+            showStatus('Authentication system not available. Please check your connection.', 'error');
+        }
+
+        // Form switching handlers
+        document.getElementById('create-account-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('create-account-form').style.display = 'block';
+            document.getElementById('forgot-password-form').style.display = 'none';
+        });
+
+        document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('create-account-form').style.display = 'none';
+            document.getElementById('forgot-password-form').style.display = 'block';
+        });
+
+        document.getElementById('back-to-login-btn').addEventListener('click', () => {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('create-account-form').style.display = 'none';
+            document.getElementById('forgot-password-form').style.display = 'none';
+        });
+
+        document.getElementById('back-to-login-from-reset-btn').addEventListener('click', () => {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('create-account-form').style.display = 'none';
+            document.getElementById('forgot-password-form').style.display = 'none';
+        });
+
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const emailInput = document.getElementById('email').value.trim();
+            const passwordInput = document.getElementById('password').value;
+
+            const errorMessage = document.getElementById('login-error');
+            errorMessage.style.display = 'none';
+            hideStatus();
+
+            if (!emailInput || !passwordInput) {
+                errorMessage.textContent = 'Please enter both email and password.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const result = await FirebaseAuth.signInWithEmail(emailInput, passwordInput);
+                
+                if (result.success) {
+                    showStatus('Login successful! Redirecting...', 'success');
+                    localStorage.setItem('loggedIn', 'true');
+                    
+                    // Update user profile (will create if doesn't exist, update if exists)
+                    await SecurityManager.createUserProfile(result.user);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    errorMessage.textContent = result.error;
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                errorMessage.textContent = 'Authentication failed. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Create account form handler
+        document.getElementById('create-account-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const emailInput = document.getElementById('new-email').value.trim();
+            const displayNameInput = document.getElementById('display-name').value.trim();
+            const passwordInput = document.getElementById('new-password').value;
+            const confirmPasswordInput = document.getElementById('confirm-password').value;
+
+            const errorMessage = document.getElementById('create-account-error');
+            errorMessage.style.display = 'none';
+
+            if (!emailInput || !displayNameInput || !passwordInput || !confirmPasswordInput) {
+                errorMessage.textContent = 'Please fill in all fields.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (passwordInput !== confirmPasswordInput) {
+                errorMessage.textContent = 'Passwords do not match.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (passwordInput.length < 6) {
+                errorMessage.textContent = 'Password must be at least 6 characters long.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const result = await FirebaseAuth.createUserAccount(emailInput, passwordInput, displayNameInput);
+                
+                if (result.success) {
+                    showStatus('Account created successfully! Redirecting...', 'success');
+                    localStorage.setItem('loggedIn', 'true');
+                    
+                    // Create user profile
+                    await SecurityManager.createUserProfile(result.user);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    errorMessage.textContent = result.error;
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Account creation error:', error);
+                errorMessage.textContent = 'Account creation failed. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Forgot password form handler
+        document.getElementById('forgot-password-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const emailInput = document.getElementById('reset-email').value.trim();
+            const errorMessage = document.getElementById('reset-password-error');
+            errorMessage.style.display = 'none';
+
+            if (!emailInput) {
+                errorMessage.textContent = 'Please enter your email address.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const result = await FirebaseAuth.resetPassword(emailInput);
+                
+                if (result.success) {
+                    showStatus('Password reset email sent! Check your inbox.', 'success');
+                    // Switch back to login form
+                    setTimeout(() => {
+                        document.getElementById('login-form').style.display = 'block';
+                        document.getElementById('forgot-password-form').style.display = 'none';
+                    }, 2000);
+                } else {
+                    errorMessage.textContent = result.error;
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Password reset error:', error);
+                errorMessage.textContent = 'Password reset failed. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Monitor online/offline status
+        window.addEventListener('online', () => {
+            showStatus('Internet connection restored.', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showStatus('Internet connection lost. Please check your network.', 'error');
+        });
+    });
+</script>
+</body>
+</html>

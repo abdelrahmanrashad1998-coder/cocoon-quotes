@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Navigation Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .nav-preview {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background: white;
+            border: 1px solid #dee2e6;
+        }
+        .nav-links a:hover {
+            background: #f8f9fa;
+        }
+        .nav-links a.hidden {
+            display: none;
+        }
+        .nav-links a.visible {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body>
+    <h1>🔧 Admin Navigation Fix</h1>
+    <p>This page helps fix the User Management link visibility for admin users.</p>
+    
+    <div id="status-container">
+        <div class="status-box warning">
+            <strong>Checking...</strong><br>
+            Please wait while we check your admin status and fix navigation.
+        </div>
+    </div>
+    
+    <div id="actions" style="display: none;">
+        <h2>Admin Navigation Actions</h2>
+        <button class="btn btn-success" onclick="fixAdminNavigation()">Fix Admin Navigation</button>
+        <button class="btn" onclick="checkAdminStatus()">Check Admin Status</button>
+        <button class="btn" onclick="showNavPreview()">Show Navigation Preview</button>
+        <a href="dashboard.html" class="btn">Go to Dashboard</a>
+        <a href="admin.html" class="btn">Go to User Management</a>
+    </div>
+    
+    <div id="nav-preview" class="nav-preview" style="display: none;">
+        <h3>Navigation Preview</h3>
+        <p>This shows how your navigation should look:</p>
+        <div class="nav-links">
+            <a href="quote-generator.html" class="visible"><i class="fas fa-plus-circle"></i> New Quote</a>
+            <a href="profile-manager.html" class="visible"><i class="fas fa-database"></i> Profile Import</a>
+            <a href="admin.html" id="preview-user-management" class="hidden"><i class="fas fa-users-cog"></i> User Management</a>
+            <button class="btn btn-secondary">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let userRole = 'user';
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await runChecks();
+        });
+        
+        async function runChecks() {
+            const container = document.getElementById('status-container');
+            container.innerHTML = '';
+            
+            // Test 1: Firebase Auth Initialization
+            try {
+                await FirebaseAuth.initializeAuth();
+                addStatus('success', '✅ Firebase Auth Initialized', 'Authentication system is working.');
+            } catch (error) {
+                addStatus('error', '❌ Firebase Auth Failed', error.message);
+                return;
+            }
+            
+            // Test 2: Check if user is authenticated
+            currentUser = FirebaseAuth.getCurrentUser();
+            if (!currentUser) {
+                addStatus('warning', '⚠️ Not Authenticated', 'Please log in first to check admin status.');
+                showActions();
+                return;
+            }
+            
+            addStatus('success', '✅ User Authenticated', `Logged in as: ${currentUser.email}`);
+            
+            // Test 3: Get user role
+            await getUserRole();
+            
+            showActions();
+        }
+        
+        async function getUserRole() {
+            try {
+                const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    userRole = userDoc.data().role || 'user';
+                    addStatus('success', '✅ User Role Retrieved', `Your role is: ${userRole}`);
+                } else {
+                    addStatus('warning', '⚠️ No User Profile', 'User profile not found, using default role: user');
+                }
+            } catch (error) {
+                addStatus('error', '❌ Role Check Failed', error.message);
+            }
+        }
+        
+        async function checkAdminStatus() {
+            try {
+                addStatus('info', '🔄 Checking Admin Status...', 'Verifying admin permissions...');
+                
+                const hasPermission = await SecurityManager.hasPermission('manage_users');
+                
+                if (hasPermission) {
+                    addStatus('success', '✅ Admin Permissions Confirmed', 'You have admin permissions. User Management should be accessible.');
+                } else {
+                    addStatus('warning', '⚠️ No Admin Permissions', 'You do not have admin permissions. User Management will not be accessible.');
+                }
+                
+            } catch (error) {
+                addStatus('error', '❌ Admin Status Check Failed', error.message);
+            }
+        }
+        
+        async function fixAdminNavigation() {
+            try {
+                addStatus('info', '🔄 Fixing Admin Navigation...', 'Attempting to fix navigation...');
+                
+                // Check if user is admin
+                if (userRole !== 'admin') {
+                    addStatus('warning', '⚠️ Not Admin User', 'Only admin users can access User Management. Your role is: ' + userRole);
+                    return;
+                }
+                
+                // Try to open dashboard in new window and show user management
+                const dashboardUrl = 'dashboard.html';
+                const newWindow = window.open(dashboardUrl, '_blank');
+                
+                if (newWindow) {
+                    addStatus('success', '✅ Dashboard Opened', 'Dashboard opened in new window. User Management link should be visible.');
+                    
+                    // Wait a moment then try to show the link
+                    setTimeout(() => {
+                        try {
+                            newWindow.showUserManagementForAdmin();
+                            addStatus('success', '✅ Navigation Fixed', 'User Management link should now be visible in the dashboard.');
+                        } catch (error) {
+                            addStatus('warning', '⚠️ Manual Fix Needed', 'Please manually show the User Management link in the dashboard.');
+                        }
+                    }, 2000);
+                } else {
+                    addStatus('warning', '⚠️ Popup Blocked', 'Please allow popups and try again, or manually navigate to the dashboard.');
+                }
+                
+            } catch (error) {
+                addStatus('error', '❌ Navigation Fix Failed', error.message);
+            }
+        }
+        
+        function showNavPreview() {
+            const previewContainer = document.getElementById('nav-preview');
+            const previewLink = document.getElementById('preview-user-management');
+            
+            if (userRole === 'admin') {
+                previewLink.className = 'visible';
+                addStatus('success', '✅ Navigation Preview', 'User Management link should be visible for admin users.');
+            } else {
+                previewLink.className = 'hidden';
+                addStatus('info', '📋 Navigation Preview', 'User Management link is hidden for non-admin users.');
+            }
+            
+            previewContainer.style.display = 'block';
+        }
+        
+        function addStatus(type, title, message) {
+            const container = document.getElementById('status-container');
+            const statusBox = document.createElement('div');
+            statusBox.className = `status-box ${type}`;
+            statusBox.innerHTML = `<strong>${title}</strong><br>${message}`;
+            container.appendChild(statusBox);
+        }
+        
+        function showActions() {
+            document.getElementById('actions').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

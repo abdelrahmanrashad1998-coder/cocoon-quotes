@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Quote Visibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .quote-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .quote-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .quote-id {
+            font-weight: 600;
+            color: #333;
+        }
+        .quote-owner {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .quote-details {
+            font-size: 0.9rem;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body>
+    <h1>🔍 Quote Visibility Test</h1>
+    <p>Testing if users can see their own quotes after creating them and admin navigation works.</p>
+    
+    <div id="status-container">
+        <div class="status-box warning">
+            <strong>Testing...</strong><br>
+            Please wait while we test quote visibility and admin navigation.
+        </div>
+    </div>
+    
+    <div id="actions" style="display: none;">
+        <h2>Test Actions</h2>
+        <button class="btn" onclick="testQuoteCreation()">Create Test Quote</button>
+        <button class="btn" onclick="testQuoteVisibility()">Test Quote Visibility</button>
+        <button class="btn" onclick="testAdminNavigation()">Test Admin Navigation</button>
+        <button class="btn" onclick="showDebugInfo()">Show Debug Info</button>
+        <a href="dashboard.html" class="btn">Go to Dashboard</a>
+        <a href="admin.html" class="btn">Go to User Management</a>
+    </div>
+    
+    <div id="debug-info" class="debug-info" style="display: none;">
+        <h3>Debug Information</h3>
+        <div id="debug-content"></div>
+    </div>
+    
+    <div id="quote-display" style="display: none;">
+        <h3>Your Quotes</h3>
+        <div id="quote-count"></div>
+        <div id="quote-grid" class="quote-grid"></div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let userRole = 'user';
+        let quotes = [];
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await runTests();
+        });
+        
+        async function runTests() {
+            const container = document.getElementById('status-container');
+            container.innerHTML = '';
+            
+            // Test 1: Firebase Auth Initialization
+            try {
+                await FirebaseAuth.initializeAuth();
+                addStatus('success', '✅ Firebase Auth Initialized', 'Authentication system is working.');
+            } catch (error) {
+                addStatus('error', '❌ Firebase Auth Failed', error.message);
+                return;
+            }
+            
+            // Test 2: Check if user is authenticated
+            currentUser = FirebaseAuth.getCurrentUser();
+            if (!currentUser) {
+                addStatus('warning', '⚠️ Not Authenticated', 'Please log in first to test quote visibility.');
+                showActions();
+                return;
+            }
+            
+            addStatus('success', '✅ User Authenticated', `Logged in as: ${currentUser.email}`);
+            
+            // Test 3: Get user role
+            await getUserRole();
+            
+            showActions();
+        }
+        
+        async function getUserRole() {
+            try {
+                const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    userRole = userDoc.data().role || 'user';
+                    addStatus('success', '✅ User Role Retrieved', `Your role is: ${userRole}`);
+                } else {
+                    addStatus('warning', '⚠️ No User Profile', 'User profile not found, using default role: user');
+                }
+            } catch (error) {
+                addStatus('error', '❌ Role Check Failed', error.message);
+            }
+        }
+        
+        async function testQuoteCreation() {
+            try {
+                addStatus('info', '🔄 Creating Test Quote...', 'Creating a new test quote...');
+                
+                const testQuote = {
+                    id: 'test-quote-' + Date.now(),
+                    clientName: 'Test Client ' + new Date().toLocaleTimeString(),
+                    clientEmail: 'test@example.com',
+                    clientPhone: '123-456-7890',
+                    items: [
+                        {
+                            type: 'window',
+                            system: 'sliding',
+                            width: 1.2,
+                            height: 1.5,
+                            quantity: 2
+                        }
+                    ],
+                    totalAmount: 2500,
+                    status: 'draft',
+                    createdAt: new Date().toISOString()
+                };
+                
+                await FirebaseDB.Quotes.saveQuote(testQuote);
+                addStatus('success', '✅ Test Quote Created', `Quote created with ID: ${testQuote.id}`);
+                
+                // Wait a moment then test visibility
+                setTimeout(() => {
+                    testQuoteVisibility();
+                }, 1000);
+                
+            } catch (error) {
+                addStatus('error', '❌ Test Quote Creation Failed', error.message);
+            }
+        }
+        
+        async function testQuoteVisibility() {
+            try {
+                addStatus('info', '🔄 Testing Quote Visibility...', `Testing quote visibility for ${userRole} user...`);
+                
+                quotes = await FirebaseDB.Quotes.loadQuotes();
+                addStatus('success', '✅ Quote Visibility Test', `Successfully loaded ${quotes.length} quotes for ${userRole} user.`);
+                
+                // Display quotes
+                displayQuotes();
+                
+                // Check if user can see their own quotes
+                const ownQuotes = quotes.filter(q => q.createdBy === currentUser.uid);
+                if (ownQuotes.length > 0) {
+                    addStatus('success', '✅ Own Quotes Visible', `You can see ${ownQuotes.length} of your own quotes.`);
+                } else {
+                    addStatus('warning', '⚠️ No Own Quotes Visible', 'You cannot see any of your own quotes. This might be an issue.');
+                }
+                
+            } catch (error) {
+                addStatus('error', '❌ Quote Visibility Failed', error.message);
+            }
+        }
+        
+        async function testAdminNavigation() {
+            try {
+                addStatus('info', '🔄 Testing Admin Navigation...', 'Testing if admin navigation would work...');
+                
+                const hasPermission = await SecurityManager.hasPermission('manage_users');
+                
+                if (hasPermission) {
+                    addStatus('success', '✅ Admin Navigation Ready', 'You have admin permissions. User Management link should be visible.');
+                } else {
+                    addStatus('warning', '⚠️ No Admin Permissions', 'You do not have admin permissions. User Management link should be hidden.');
+                }
+                
+            } catch (error) {
+                addStatus('error', '❌ Admin Navigation Test Failed', error.message);
+            }
+        }
+        
+        function showDebugInfo() {
+            const debugContainer = document.getElementById('debug-info');
+            const debugContent = document.getElementById('debug-content');
+            
+            const debugInfo = {
+                currentUser: currentUser ? {
+                    uid: currentUser.uid,
+                    email: currentUser.email
+                } : null,
+                userRole: userRole,
+                quotesCount: quotes.length,
+                ownQuotesCount: quotes.filter(q => q.createdBy === currentUser?.uid).length,
+                allQuotes: quotes.map(q => ({
+                    id: q.id,
+                    createdBy: q.createdBy,
+                    isOwn: q.createdBy === currentUser?.uid,
+                    clientName: q.clientName,
+                    createdAt: q.createdAt
+                }))
+            };
+            
+            debugContent.innerHTML = `<pre>${JSON.stringify(debugInfo, null, 2)}</pre>`;
+            debugContainer.style.display = 'block';
+            
+            addStatus('info', '📋 Debug Info', 'Showing detailed debug information.');
+        }
+        
+        function displayQuotes() {
+            const container = document.getElementById('quote-display');
+            const countElement = document.getElementById('quote-count');
+            const gridElement = document.getElementById('quote-grid');
+            
+            countElement.innerHTML = `<strong>Total Quotes Accessible: ${quotes.length}</strong>`;
+            
+            if (quotes.length === 0) {
+                gridElement.innerHTML = '<p>No quotes found or accessible.</p>';
+            } else {
+                const quotesHtml = quotes.slice(0, 10).map(quote => `
+                    <div class="quote-card">
+                        <div class="quote-header">
+                            <div class="quote-id">Quote #${quote.id}</div>
+                            <div class="quote-owner">${quote.createdBy === currentUser.uid ? 'Yours' : 'Other User'}</div>
+                        </div>
+                        <div class="quote-details">
+                            <p><strong>Client:</strong> ${quote.clientName || 'N/A'}</p>
+                            <p><strong>Amount:</strong> ${quote.totalAmount || 'N/A'} EGP</p>
+                            <p><strong>Status:</strong> ${quote.status || 'N/A'}</p>
+                            <p><strong>Created:</strong> ${new Date(quote.createdAt).toLocaleDateString()}</p>
+                            <p><strong>Created By:</strong> ${quote.createdBy || 'N/A'}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                gridElement.innerHTML = quotesHtml;
+                
+                if (quotes.length > 10) {
+                    gridElement.innerHTML += `<p><em>Showing first 10 of ${quotes.length} quotes</em></p>`;
+                }
+            }
+            
+            container.style.display = 'block';
+        }
+        
+        function addStatus(type, title, message) {
+            const container = document.getElementById('status-container');
+            const statusBox = document.createElement('div');
+            statusBox.className = `status-box ${type}`;
+            statusBox.innerHTML = `<strong>${title}</strong><br>${message}`;
+            container.appendChild(statusBox);
+        }
+        
+        function showActions() {
+            document.getElementById('actions').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

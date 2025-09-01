@@ -1,0 +1,4014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://db.onlinewebfonts.com/c/28c0ba929947563500b21da15a88c6fe?family=TacticSans-Reg" rel="stylesheet"/>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Cocoon Aluminum Works - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    
+    <style>
+        :root {
+            --cocoon-primary: #A72036;
+            --cocoon-dark: #303038;
+            --cocoon-light: #F9BC77;
+            --cocoon-white: #FFFFFF;
+            --cocoon-light-bg: #f8f8f8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--cocoon-light-bg);
+            color: var(--cocoon-dark);
+            font-family: "TacticSans-Reg", sans-serif;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .brand-header {
+            background-color: var(--cocoon-white);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .brand-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            width: 200px;
+            height: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--cocoon-dark);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links a:hover {
+            color: var(--cocoon-primary);
+        }
+        
+        .tagline {
+            font-style: italic;
+            color: var(--cocoon-dark);
+            font-size: 1.1rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 30px 0;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            color: var(--cocoon-primary);
+            margin-bottom: 10px;
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--cocoon-dark);
+            opacity: 0.8;
+        }
+        
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            background: var(--cocoon-white);
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            max-width: 200px;
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+            color: var(--cocoon-dark);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: "TacticSans-Reg", sans-serif;
+        }
+        
+        .tab-btn.active {
+            background: var(--cocoon-primary);
+            color: var(--cocoon-white);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: rgba(167, 32, 54, 0.1);
+            color: var(--cocoon-primary);
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dashboard Analytics */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: var(--cocoon-white);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+            text-align: center;
+            border-top: 4px solid var(--cocoon-primary);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            color: var(--cocoon-primary);
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--cocoon-dark);
+            margin-bottom: 10px;
+        }
+        
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--cocoon-primary);
+        }
+        
+        .card-description {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 10px;
+        }
+        
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--cocoon-white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .quotes-count {
+            font-size: 1.1rem;
+            color: var(--cocoon-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: "TacticSans-Reg", sans-serif;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--cocoon-primary);
+            color: var(--cocoon-white);
+        }
+        
+        .btn-primary:hover {
+            background: #8a1a2c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(167, 32, 54, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: var(--cocoon-dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        /* Quote Cards */
+        .quotes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .quote-card {
+            background: var(--cocoon-white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 4px solid var(--cocoon-primary);
+        }
+        
+        .quote-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .quote-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--cocoon-primary);
+            margin-bottom: 5px;
+        }
+        
+        .quote-id {
+            font-size: 0.85rem;
+            color: #666;
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .quote-info {
+            margin-bottom: 20px;
+        }
+        
+        .quote-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+            color: var(--cocoon-dark);
+        }
+        
+        .quote-description {
+            background: rgba(167, 32, 54, 0.05);
+            padding: 12px;
+            border-radius: 6px;
+            font-style: italic;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--cocoon-light);
+        }
+        
+        .quote-items {
+            margin-bottom: 20px;
+        }
+        
+        .items-summary {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .item-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .item-tag {
+            background: var(--cocoon-light);
+            color: var(--cocoon-dark);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .quote-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .quote-dates {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .quote-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Quote Detail Modal */
+        .quote-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .quote-detail-modal.active {
+            display: flex;
+        }
+        
+        .quote-detail-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 1200px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        .quote-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 2px solid var(--cocoon-light);
+            background: var(--cocoon-primary);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .quote-detail-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .quote-detail-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quote-detail-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .quote-detail-body {
+            padding: 0;
+        }
+        
+        /* Quote Detail Tabs */
+        .quote-detail-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .quote-detail-tab {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            background: transparent;
+            color: var(--cocoon-dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: "TacticSans-Reg", sans-serif;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .quote-detail-tab.active {
+            background: white;
+            color: var(--cocoon-primary);
+            border-bottom-color: var(--cocoon-primary);
+        }
+        
+        .quote-detail-tab:hover:not(.active) {
+            background: rgba(167, 32, 54, 0.05);
+        }
+        
+        .quote-detail-tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .quote-detail-tab-content.active {
+            display: block;
+        }
+        
+        /* Pricing Analysis Styles */
+        .pricing-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-card {
+            background: linear-gradient(135deg, var(--cocoon-primary), #8a1a2c);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(167, 32, 54, 0.3);
+        }
+        
+        .pricing-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .pricing-card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .pricing-card-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .detailed-breakdown {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .breakdown-title {
+            color: var(--cocoon-primary);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .breakdown-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--cocoon-primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .breakdown-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .breakdown-item-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--cocoon-dark);
+        }
+        
+        .breakdown-item-total {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--cocoon-primary);
+        }
+        
+        .breakdown-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .breakdown-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #dee2e6;
+        }
+        
+        .breakdown-detail:last-child {
+            border-bottom: none;
+            font-weight: 600;
+        }
+        
+        /* Visual Charts */
+        .visual-analysis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .chart-title {
+            color: var(--cocoon-primary);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* Customer Quote Styles */
+        .customer-quote {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .quote-header-section {
+            background: var(--cocoon-primary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .quote-company-logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        
+        .quote-company-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .quote-company-tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .quote-content-section {
+            padding: 30px;
+        }
+        
+        .quote-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .quote-info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .quote-info-title {
+            color: var(--cocoon-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quote-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .quote-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .quote-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .quote-items-table th {
+            background: var(--cocoon-primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .quote-items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .quote-items-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .quote-items-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .quote-total-section {
+            background: var(--cocoon-primary);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .quote-total-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .quote-total-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .quote-footer-section {
+            background: #f8f9fa;
+            padding: 25px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .quote-contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .quote-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--cocoon-dark);
+        }
+        
+        .quote-validity {
+            font-style: italic;
+            color: #666;
+            margin-top: 15px;
+        }
+        
+        /* Export Buttons */
+        .export-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .btn-export {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-export:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        /* Responsive Design for Quote Detail */
+        @media (max-width: 768px) {
+            .quote-detail-content {
+                width: 98%;
+                max-height: 95vh;
+            }
+            
+            .quote-detail-header {
+                padding: 20px;
+            }
+            
+            .quote-detail-title {
+                font-size: 1.5rem;
+            }
+            
+            .quote-detail-tabs {
+                flex-direction: column;
+            }
+            
+            .quote-detail-tab-content {
+                padding: 20px;
+            }
+            
+            .pricing-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .visual-analysis {
+                grid-template-columns: 1fr;
+            }
+            
+            .quote-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quote-contact-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--cocoon-white);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            color: var(--cocoon-light);
+            margin-bottom: 20px;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            color: var(--cocoon-primary);
+            margin-bottom: 10px;
+        }
+        
+        .empty-text {
+            color: #666;
+            margin-bottom: 30px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--cocoon-light);
+        }
+        
+        .modal-title {
+            color: var(--cocoon-primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: var(--cocoon-primary);
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        
+        /* Success Notification */
+        .success-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: none;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        .success-notification.active {
+            display: block;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Brand Footer */
+        .brand-footer {
+            background: var(--cocoon-dark);
+            color: var(--cocoon-white);
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--cocoon-white);
+            margin-bottom: 10px;
+        }
+        
+        .footer-tagline {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .brand-container {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            
+            
+            .quotes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .quote-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .quote-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .tab-navigation {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .tab-btn {
+                max-width: none;
+            }
+        }
+
+        /* Search Section Styles */
+        .search-section {
+            background: var(--cocoon-white);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input-group {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            z-index: 2;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: "TacticSans-Reg", sans-serif;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--cocoon-primary);
+            box-shadow: 0 0 0 3px rgba(167, 32, 54, 0.1);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .search-clear:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: "TacticSans-Reg", sans-serif;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--cocoon-primary);
+        }
+
+        .search-results {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Clients Grid Styles */
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .client-card {
+            background: var(--cocoon-white);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--cocoon-primary);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .client-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .client-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--cocoon-dark);
+            margin-bottom: 5px;
+        }
+
+        .client-email {
+            color: var(--cocoon-primary);
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .client-email:hover {
+            text-decoration: underline;
+        }
+
+        .client-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .client-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .meta-value {
+            font-size: 0.9rem;
+            color: var(--cocoon-dark);
+            font-weight: 600;
+        }
+
+        .client-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--cocoon-primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .client-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive adjustments for search and clients */
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input-group {
+                min-width: auto;
+            }
+
+            .search-filters {
+                justify-content: center;
+            }
+
+            .clients-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .client-info {
+                grid-template-columns: 1fr;
+            }
+
+            .client-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Brand Header -->
+    <header class="brand-header">
+        <div class="container brand-container">
+            <div class="logo">
+                <img alt="Cocoon Logo" class="logo" src="https://img1.wsimg.com/isteam/ip/b11b2784-66bc-4ac4-9b05-6ba6d416d22d/Untitled%20design%20(1).jpg"/>
+            </div>
+            <nav class="nav-links">
+                <a href="quote-generator.html"><i class="fas fa-plus-circle"></i> New Quote</a>
+                <a href="profile-manager.html"><i class="fas fa-database"></i> Profile Import</a>
+                <a href="admin.html" id="user-management-link" style="display: none;" onclick="handleUserManagementClick(event)"><i class="fas fa-users-cog"></i> User Management</a>
+                <button class="btn btn-secondary" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </nav>
+            <div class="tagline">The Quality You Deserve</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Manage your aluminum work quotes and track your business analytics</p>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchTab('analytics')">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </button>
+                <button class="tab-btn" onclick="switchTab('quotes')">
+                    <i class="fas fa-quote-left"></i> Saved Quotes
+                </button>
+                <button class="tab-btn" onclick="switchTab('clients')">
+                    <i class="fas fa-users"></i> Clients
+                </button>
+            </div>
+
+
+            <div class="tab-content" id="clients-tab">
+                <!-- Search Bar -->
+                <div class="search-section">
+                    <div class="search-container">
+                        <div class="search-input-group">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="clientsSearchInput" class="search-input" placeholder="Search by client name, email, or phone..." oninput="filterClients()">
+                            <button class="search-clear" onclick="clearClientsSearch()" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="search-filters">
+                            <select id="clientsFilterQuotes" class="filter-select" onchange="filterClients()">
+                                <option value="all">All Clients</option>
+                                <option value="active">Active Clients</option>
+                                <option value="inactive">Inactive Clients</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="search-results">
+                        <span id="clientsSearchResults">Showing all clients</span>
+                    </div>
+                </div>
+        
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <div class="clients-count">
+                        <i class="fas fa-users"></i>
+                        <span id="clientsCount">0</span> clients
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="exportClientsData()">
+                            <i class="fas fa-download"></i> Export Clients
+                        </button>
+                    </div>
+                </div>
+        
+                <!-- Clients Grid -->
+                <div class="clients-grid" id="clientsGrid">
+                    <!-- Client cards will be inserted here -->
+                </div>
+        
+                <!-- Empty State -->
+                <div class="empty-state" id="clientsEmptyState" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h2 class="empty-title">No Clients Found</h2>
+                    <p class="empty-text">
+                        No clients match your search criteria. Try adjusting your search terms or filters.
+                    </p>
+                </div>
+            </div>
+
+            
+
+            <!-- Analytics Tab -->
+            <div class="tab-content active" id="analytics-tab">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="card-title">Quotes Today</div>
+                        <div class="card-value" id="quotes-today">0</div>
+                        <div class="card-description">New quote requests received today</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="card-title">Quotes This Month</div>
+                        <div class="card-value" id="quotes-month">0</div>
+                        <div class="card-description">Total quote requests for the current month</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-users"></i></div>
+                        <div class="card-title">New Clients This Month</div>
+                        <div class="card-value" id="new-clients">0</div>
+                        <div class="card-description">Unique clients who requested quotes</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons" style="display: flex; justify-content: center; gap: 20px; margin-top: 40px;">
+                    <a href="quote-generator.html" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create New Quote</a>
+                    <button class="btn btn-secondary" onclick="switchTab('quotes')"><i class="fas fa-search"></i> Browse Saved Quotes</button>
+                </div>
+            </div>
+
+            <!-- Quotes Tab -->
+            <div class="tab-content" id="quotes-tab">
+                <!-- Search Bar -->
+                <div class="search-section">
+                    <div class="search-container">
+                        <div class="search-input-group">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="quotesSearchInput" class="search-input" placeholder="Search by quote name or customer name..." oninput="filterQuotes()">
+                            <button class="search-clear" onclick="clearQuotesSearch()" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="search-filters">
+                            <select id="quotesFilterType" class="filter-select" onchange="filterQuotes()">
+                                <option value="all">All Types</option>
+                                <option value="residential">Residential</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="industrial">Industrial</option>
+                            </select>
+                            <select id="quotesFilterDate" class="filter-select" onchange="filterQuotes()">
+                                <option value="all">All Dates</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="search-results">
+                        <span id="quotesSearchResults">Showing all quotes</span>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <div class="quotes-count">
+                        <i class="fas fa-quote-left"></i>
+                        <span id="quotesCount">0</span> saved quotes
+                    </div>
+                    <div class="action-buttons">
+                        <a href="quote-generator.html" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create New Quote
+                        </a>
+                        <button class="btn btn-secondary" onclick="exportAllQuotes()">
+                            <i class="fas fa-download"></i> Export All
+                        </button>
+                        <button class="btn btn-danger" onclick="showClearAllDialog()">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quotes Grid -->
+                <div class="quotes-grid" id="quotesGrid">
+                    <!-- Quote cards will be inserted here -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-quote-left"></i>
+                    </div>
+                    <h2 class="empty-title">No Saved Quotes</h2>
+                    <p class="empty-text">
+                        You haven't saved any quotes yet. Create your first quote to get started with managing your aluminum work projects.
+                    </p>
+                    <a href="quote-generator.html" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Your First Quote
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clients Tab -->
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Delete Quote</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this quote? This action cannot be undone.</p>
+                <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
+                    <strong id="deleteQuoteName">Quote Name</strong>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> Delete Quote
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Confirmation Modal -->
+    <div class="modal-overlay" id="clearAllModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Clear All Quotes</h3>
+                <button class="modal-close" onclick="closeClearAllModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete all saved quotes? This action cannot be undone.</p>
+                <div style="margin-top: 15px; padding: 15px; background: #f8d7da; border-radius: 6px; border-left: 4px solid #dc3545;">
+                    <strong>Warning:</strong> This will permanently delete all <span id="totalQuotesCount">0</span> saved quotes.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeClearAllModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmClearAll()">
+                    <i class="fas fa-trash"></i> Delete All Quotes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Detail Modal -->
+    <div class="quote-detail-modal" id="quoteDetailModal">
+        <div class="quote-detail-content">
+            <div class="quote-detail-header">
+                <h2 class="quote-detail-title" id="quoteDetailTitle">Quote Details</h2>
+                <button class="quote-detail-close" onclick="closeQuoteDetailModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- <div class="quote-detail-body">
+                <div class="quote-detail-tabs">
+                    <button class="quote-detail-tab active" onclick="switchQuoteDetailTab('analysis')">
+                        <i class="fas fa-chart-line"></i> Pricing Analysis
+                    </button>
+                    <button class="quote-detail-tab" onclick="switchQuoteDetailTab('customer')">
+                        <i class="fas fa-file-invoice"></i> Customer Quote
+                    </button>
+                </div> -->
+                
+
+                <div class="export-actions">
+                    <button class="btn-export" onclick="exportQuoteToPDF()">
+                        <i class="fas fa-file-pdf"></i> PDF Preview
+                    </button>
+                    <button class="btn-export" onclick="printQuote()">
+                        <i class="fas fa-print"></i> Print Quote
+                    </button>
+                    <!-- <button class="btn-export" onclick="emailQuote()">
+                        <i class="fas fa-envelope"></i> Email Quote
+                    </button> -->
+                </div>
+                <div class="customer-quote" id="customerQuote">
+                    <!-- Customer quote content will be inserted here -->
+                </div>
+
+
+                <!-- Pricing Analysis Tab -->
+                <div class="quote-detail-tab-content active" id="analysis-content">
+                    <div class="pricing-overview" id="pricingOverview">
+                        <!-- Pricing cards will be inserted here -->
+                    </div>
+                    
+                    <div class="detailed-breakdown">
+                        <h3 class="breakdown-title">
+                            <i class="fas fa-calculator"></i> Detailed Cost Breakdown
+                        </h3>
+                        <div id="detailedBreakdown">
+                            <!-- Breakdown items will be inserted here -->
+                        </div>
+                    </div>
+                    
+                    <div class="visual-analysis">
+                        <div class="chart-container">
+                            <h4 class="chart-title">Cost Distribution</h4>
+                            <canvas id="costChart" width="400" height="300"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h4 class="chart-title">Profit Analysis</h4>
+                            <canvas id="profitChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Quote Tab -->
+                <div class="quote-detail-tab-content" id="customer-content">
+                    <!-- <div class="export-actions">
+                        <button class="btn-export" onclick="exportQuoteToPDF()">
+                            <i class="fas fa-file-pdf"></i> PDF Preview
+                        </button>
+                        <button class="btn-export" onclick="printQuote()">
+                            <i class="fas fa-print"></i> Print Quote
+                        </button>
+                        <!-- <button class="btn-export" onclick="emailQuote()">
+                            <i class="fas fa-envelope"></i> Email Quote
+                        </button> -->
+                    </div>
+                    <div class="customer-quote" id="customerQuote">
+                        <!-- Customer quote content will be inserted here -->
+                    </div> -->
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div class="success-notification" id="successNotification">
+        <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
+        <span id="notificationText">Action completed successfully!</span>
+    </div>
+
+    <!-- Brand Footer -->
+    <footer class="brand-footer">
+        <div class="container">
+            <div class="footer-logo">COCOON</div>
+            <div class="footer-tagline">The Quality You Deserve</div>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+20 11 51717149</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>sales.department@cocoonaluminum.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>61 Seventh neighborhood, Fourth District, El-Shaikh Zayed, Giza</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        var quotes = [];
+        var quoteToDelete = null;
+        var currentTab = 'analytics';
+        var profiles = []; // Add profiles array for pricing calculations
+
+        // Debug function to check if functions are loaded
+        function debugCheck() {
+            console.log('Functions loaded:', {
+                switchTab: typeof switchTab,
+                loadQuotes: typeof loadQuotes,
+                exportAllQuotes: typeof exportAllQuotes,
+                showClearAllDialog: typeof showClearAllDialog,
+                loadProfiles: typeof loadProfiles
+            });
+        }
+
+        // Load profiles from Firebase for pricing calculations
+        async function loadProfiles() {
+            try {
+                console.log('Loading profiles from Firebase for pricing calculations...');
+                
+                // Check if Firebase is available
+                if (!FirebaseDB || !FirebaseDB.Profiles) {
+                    console.warn('Firebase not available, falling back to localStorage');
+                    // Fallback to localStorage
+                    const savedProfiles = localStorage.getItem('cocoonProfiles');
+                    if (savedProfiles) {
+                        profiles = JSON.parse(savedProfiles);
+                        window.cocoonProfiles = profiles;
+                        console.log(`Loaded ${profiles.length} profiles from localStorage fallback`);
+                    } else {
+                        profiles = [];
+                        console.log('No profiles found in localStorage fallback');
+                    }
+                    return;
+                }
+                
+                // Load from Firebase
+                profiles = await FirebaseDB.Profiles.loadProfiles();
+                window.cocoonProfiles = profiles;
+                
+                if (profiles.length === 0) {
+                    console.warn('No profile data available in Firebase. Please import profiles using the Profile Import page.');
+                } else {
+                    console.log(`Successfully loaded ${profiles.length} profiles from Firebase for pricing calculations`);
+                }
+                
+            } catch (error) {
+                console.error('Error loading profiles from Firebase:', error);
+                // Fallback to localStorage
+                try {
+                    const savedProfiles = localStorage.getItem('cocoonProfiles');
+                    if (savedProfiles) {
+                        profiles = JSON.parse(savedProfiles);
+                        window.cocoonProfiles = profiles;
+                        console.log(`Loaded ${profiles.length} profiles from localStorage fallback`);
+                    } else {
+                        profiles = [];
+                        console.log('No profiles found in localStorage fallback');
+                    }
+                } catch (fallbackError) {
+                    console.error('Error in localStorage fallback:', fallbackError);
+                    profiles = [];
+                }
+            }
+        }
+
+        // Set up role-based navigation
+        async function setupRoleBasedNavigation() {
+            try {
+                const currentUser = FirebaseAuth.getCurrentUser();
+                if (!currentUser) {
+                    console.log('No authenticated user, hiding admin features');
+                    return;
+                }
+
+                console.log('Setting up role-based navigation for user:', currentUser.email);
+
+                // Get user role from Firestore using the proper database reference
+                let userRole = 'user'; // default role
+                try {
+                    // Use the db variable from config.js if available
+                    if (typeof db !== 'undefined') {
+                        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                        if (userDoc.exists) {
+                            userRole = userDoc.data().role || 'user';
+                        }
+                    } else if (typeof firebase !== 'undefined' && firebase.firestore) {
+                        // Fallback to direct firebase.firestore() if db is not available
+                        const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                        if (userDoc.exists) {
+                            userRole = userDoc.data().role || 'user';
+                        }
+                    } else {
+                        console.warn('Firebase not available, using default role: user');
+                    }
+                } catch (error) {
+                    console.warn('Could not fetch user role from Firestore, using default role: user', error);
+                }
+
+                console.log('User role determined:', userRole);
+                
+                // Show/hide user management link based on role
+                const userManagementLink = document.getElementById('user-management-link');
+                if (userManagementLink) {
+                    if (userRole === 'admin') {
+                        userManagementLink.style.display = 'inline-flex';
+                        console.log('✅ Showing user management link for admin');
+                    } else {
+                        userManagementLink.style.display = 'none';
+                        console.log('❌ Hiding user management link for non-admin');
+                    }
+                } else {
+                    console.error('❌ User management link element not found!');
+                }
+            } catch (error) {
+                console.error('Error setting up role-based navigation:', error);
+                // On error, hide admin features for security
+                const userManagementLink = document.getElementById('user-management-link');
+                if (userManagementLink) {
+                    userManagementLink.style.display = 'none';
+                    console.log('❌ Hiding user management link due to error');
+                }
+            }
+        }
+
+        // Manual function to show user management link for admin users
+        function showUserManagementForAdmin() {
+            const userManagementLink = document.getElementById('user-management-link');
+            if (userManagementLink) {
+                userManagementLink.style.display = 'inline-flex';
+                console.log('✅ Manually showing user management link');
+            } else {
+                console.error('❌ User management link element not found');
+            }
+        }
+
+        // Function to refresh role-based navigation (useful for debugging)
+        async function refreshRoleBasedNavigation() {
+            console.log('Refreshing role-based navigation...');
+            await setupRoleBasedNavigation();
+        }
+
+        // Function to check current user role (for debugging)
+        async function checkCurrentUserRole() {
+            try {
+                const currentUser = FirebaseAuth.getCurrentUser();
+                if (!currentUser) {
+                    console.log('No authenticated user');
+                    return null;
+                }
+
+                let userRole = 'user';
+                if (typeof db !== 'undefined') {
+                    const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                    if (userDoc.exists) {
+                        userRole = userDoc.data().role || 'user';
+                    }
+                }
+                
+                console.log('Current user role:', userRole);
+                return userRole;
+            } catch (error) {
+                console.error('Error checking user role:', error);
+                return null;
+            }
+        }
+
+        // Make debugging functions available globally
+        window.refreshRoleBasedNavigation = refreshRoleBasedNavigation;
+        window.checkCurrentUserRole = checkCurrentUserRole;
+        window.showUserManagementForAdmin = showUserManagementForAdmin;
+
+        // Handle user management link click
+        async function handleUserManagementClick(event) {
+            event.preventDefault();
+            console.log('=== User Management Link Clicked ===');
+            
+            // Check current authentication status
+            const currentUser = FirebaseAuth.getCurrentUser();
+            console.log('Current user on click:', currentUser);
+            console.log('Is authenticated:', FirebaseAuth.isAuthenticated());
+            
+            // Check localStorage for session info
+            const loggedIn = localStorage.getItem('loggedIn');
+            const currentUserLocal = localStorage.getItem('currentUser');
+            console.log('localStorage loggedIn:', loggedIn);
+            console.log('localStorage currentUser:', currentUserLocal);
+            
+            // Check user role
+            try {
+                const userRole = await checkCurrentUserRole();
+                console.log('User role on click:', userRole);
+                
+                if (userRole === 'admin') {
+                    console.log('✅ Admin user confirmed, navigating to user management...');
+                    window.location.href = 'admin.html';
+                } else {
+                    console.log('❌ User is not admin, cannot access user management');
+                    alert('Access denied. Admin permissions required.');
+                }
+            } catch (error) {
+                console.error('Error checking user role:', error);
+                alert('Error checking permissions. Please try again.');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM Content Loaded');
+            debugCheck();
+            
+            // Initialize Firebase Auth
+            try {
+                await FirebaseAuth.initializeAuth();
+                console.log('Firebase Auth initialized');
+                
+                // Set up role-based navigation
+                await setupRoleBasedNavigation();
+                
+                // Set up a retry mechanism for role-based navigation in case of delays
+                setTimeout(async () => {
+                    console.log('Retrying role-based navigation setup...');
+                    await setupRoleBasedNavigation();
+                }, 2000);
+            } catch (error) {
+                console.error('Error initializing Firebase Auth:', error);
+            }
+            
+            // Load profiles first, then quotes
+            await loadProfiles();
+            await loadQuotes();
+            
+            // Set up real-time listeners if Firebase is available
+            if (FirebaseDB && FirebaseDB.Listeners) {
+                try {
+                    // Listen for quote changes
+                    FirebaseDB.Listeners.onQuotesChange((updatedQuotes) => {
+                        console.log('Quotes updated in real-time:', updatedQuotes.length);
+                        quotes = updatedQuotes;
+                        updateAnalytics();
+                        updateQuotesCount();
+                        if (currentTab === 'quotes') {
+                            displayQuotes();
+                        }
+                    });
+                    
+                    // Listen for profile changes
+                    FirebaseDB.Listeners.onProfilesChange((updatedProfiles) => {
+                        console.log('Profiles updated in real-time:', updatedProfiles.length);
+                        profiles = updatedProfiles;
+                        window.cocoonProfiles = profiles;
+                    });
+                    
+                    console.log('Real-time listeners set up successfully');
+                } catch (error) {
+                    console.error('Error setting up real-time listeners:', error);
+                }
+            }
+            
+            // Logout functionality
+            var logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('loggedIn');
+                    localStorage.removeItem('loginTime');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Refresh data every 30 seconds (fallback for non-Firebase mode)
+            setInterval(async () => {
+                if (!FirebaseDB || !FirebaseDB.Quotes) {
+                    await loadQuotes();
+                }
+            }, 30000);
+        });
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            console.log('switchTab called with:', tabName);
+            try {
+                // Update tab buttons
+                var tabButtons = document.querySelectorAll('.tab-btn');
+                for (var i = 0; i < tabButtons.length; i++) {
+                    tabButtons[i].classList.remove('active');
+                }
+                
+                var activeButton = document.querySelector('[onclick*="' + tabName + '"]');
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
+                
+                // Update tab content
+                var tabContents = document.querySelectorAll('.tab-content');
+                for (var i = 0; i < tabContents.length; i++) {
+                    tabContents[i].classList.remove('active');
+                }
+                
+                var activeContent = document.getElementById(tabName + '-tab');
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+                
+                currentTab = tabName;
+                
+                // Load quotes if switching to quotes tab
+                if (tabName === 'quotes') {
+                    displayQuotes();
+                }
+                
+                // Load clients if switching to clients tab
+                if (tabName === 'clients') {
+                    loadClients();
+                }
+            } catch (error) {
+                console.error('Error in switchTab:', error);
+            }
+        }
+
+        // Load quotes from Firebase
+        async function loadQuotes() {
+            try {
+                console.log('Loading quotes from Firebase...');
+                
+                // Check if Firebase is available
+                if (!FirebaseDB || !FirebaseDB.Quotes) {
+                    console.warn('Firebase not available, falling back to localStorage');
+                    // Fallback to localStorage
+                    quotes = JSON.parse(localStorage.getItem('cocoonQuotes') || '[]');
+                    
+                    // Add sample data if no quotes exist (for testing)
+                    const hasRealQuotes = quotes.some(q => !q.id.includes('SAMPLE'));
+                    if (quotes.length === 0 || (!hasRealQuotes && quotes.length < 3)) {
+                        createSampleQuotes();
+                    }
+                    
+                    console.log('Loaded quotes from localStorage fallback:', quotes.length);
+                } else {
+                    // Load from Firebase
+                    quotes = await FirebaseDB.Quotes.loadQuotes();
+                    
+                    // Add sample data if no quotes exist (for testing)
+                    const hasRealQuotes = quotes.some(q => !q.id.includes('SAMPLE'));
+                    if (quotes.length === 0 || (!hasRealQuotes && quotes.length < 3)) {
+                        createSampleQuotes();
+                    }
+                    
+                    console.log('Loaded quotes from Firebase:', quotes.length);
+                }
+                
+                updateAnalytics();
+                updateQuotesCount();
+                if (currentTab === 'quotes') {
+                    displayQuotes();
+                }
+            } catch (error) {
+                console.error('Error loading quotes from Firebase:', error);
+                // Fallback to localStorage
+                try {
+                    quotes = JSON.parse(localStorage.getItem('cocoonQuotes') || '[]');
+                    console.log('Loaded quotes from localStorage fallback:', quotes.length);
+                } catch (fallbackError) {
+                    console.error('Error in localStorage fallback:', fallbackError);
+                    quotes = [];
+                }
+                updateAnalytics();
+                updateQuotesCount();
+            }
+        }
+        
+        // Create sample quotes for testing
+        function createSampleQuotes() {
+            // Only add sample quotes if there are no real quotes
+            const currentQuotes = JSON.parse(localStorage.getItem('cocoonQuotes') || '[]');
+            const hasRealQuotes = currentQuotes.some(q => !q.id.includes('SAMPLE'));
+            
+            if (hasRealQuotes) {
+                quotes = currentQuotes;
+                return;
+            }
+            
+            const sampleQuotes = [
+                {
+                    id: 'QU-SAMPLE-001',
+                    name: 'Villa Project - Al Zahra',
+                    projectType: 'villa',
+                    contactInfo: {
+                        name: 'Ahmed Hassan',
+                        phone: '+966 50 123 4567',
+                        email: 'ahmed.hassan@email.com',
+                        location: 'Riyadh, Saudi Arabia',
+                        method: 'whatsapp'
+                    },
+                    items: [
+                        {
+                            id: 'item-1',
+                            uniqueId: 'ITEM-001',
+                            type: 'window',
+                            width: 2.5,
+                            height: 1.8,
+                            quantity: 4,
+                            system: 'Sliding',
+                            leaves: 2,
+                            glassType: 'double',
+                            profile: {
+                                profile_code: 'ALU-WIN-001',
+                                profile_name: 'Premium Sliding Window',
+                                Brand: 'Alumil',
+                                price: 450
+                            }
+                        },
+                        {
+                            id: 'item-2',
+                            uniqueId: 'ITEM-002',
+                            type: 'door',
+                            width: 1.2,
+                            height: 2.1,
+                            quantity: 2,
+                            system: 'hinged',
+                            leaves: 1,
+                            glassType: 'single',
+                            profile: {
+                                profile_code: 'ALU-DOOR-001',
+                                profile_name: 'Standard Hinged Door',
+                                Brand: 'Alumil',
+                                price: 650
+                            }
+                        }
+                    ],
+                    createdAt: new Date().toISOString(),
+                    lastModified: new Date().toISOString()
+                },
+                {
+                    id: 'QU-SAMPLE-002',
+                    name: 'Commercial Building - Downtown',
+                    projectType: 'commercial',
+                    contactInfo: {
+                        name: 'Sarah Al-Mahmoud',
+                        phone: '+966 55 987 6543',
+                        email: 'sarah.mahmoud@company.com',
+                        location: 'Jeddah, Saudi Arabia',
+                        method: 'email'
+                    },
+                    items: [
+                        {
+                            id: 'item-3',
+                            uniqueId: 'ITEM-003',
+                            type: 'curtain_wall',
+                            quantity: 1,
+                            designData: {
+                                wallWidth: 8.0,
+                                wallHeight: 4.5,
+                                cols: 6,
+                                rows: 3,
+                                frameMeters: 45.2,
+                                windowMeters: 28.8,
+                                glassArea: 36.0,
+                                cornerCount: 12,
+                                panels: []
+                            },
+                            curtain: {
+                                quantity: 1,
+                                glassType: 'double',
+                                profile: {
+                                    profile_code: 'ALU-CW-001',
+                                    profile_name: 'Premium Curtain Wall System',
+                                    Brand: 'Alumil',
+                                    price: 850
+                                }
+                            },
+                            profile: {
+                                profile_code: 'ALU-CW-001',
+                                profile_name: 'Premium Curtain Wall System',
+                                Brand: 'Alumil',
+                                price: 850
+                            }
+                        }
+                    ],
+                    createdAt: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+                    lastModified: new Date(Date.now() - 86400000).toISOString()
+                }
+            ];
+            
+            // Merge with existing quotes instead of replacing
+            const mergedQuotes = [...currentQuotes];
+            
+            // Only add sample quotes that don't already exist
+            sampleQuotes.forEach(sampleQuote => {
+                if (!mergedQuotes.find(q => q.id === sampleQuote.id)) {
+                    mergedQuotes.push(sampleQuote);
+                }
+            });
+            
+            quotes = mergedQuotes;
+            localStorage.setItem('cocoonQuotes', JSON.stringify(quotes));
+        }
+
+        // Calculate quote value
+        function calculateQuoteValue(quote) {
+            let totalValue = 0;
+            
+            if (!quote.items || !Array.isArray(quote.items)) {
+                return 0;
+            }
+
+            quote.items.forEach(item => {
+                if (item.profile && item.profile.price) {
+                    const price = parseFloat(item.profile.price) || 0;
+                    const quantity = parseInt(item.quantity) || 1;
+                    
+                    if (item.type === 'curtain_wall') {
+                        // For curtain walls, use design data metrics
+                        const frameMeters = item.designData?.frameMeters || 0;
+                        const windowMeters = item.designData?.windowMeters || 0;
+                        totalValue += (frameMeters + windowMeters) * price * quantity;
+                    } else {
+                        // For normal items, use area calculation
+                        const width = parseFloat(item.width) || 0;
+                        const height = parseFloat(item.height) || 0;
+                        const area = width * height;
+                        totalValue += area * price * quantity;
+                    }
+                }
+            });
+
+            return totalValue;
+        }
+
+        // Update analytics dashboard
+        function updateAnalytics() {
+            const today = new Date();
+            const todayStr = today.toISOString().slice(0, 10); // YYYY-MM-DD
+            const monthStr = today.toISOString().slice(0, 7); // YYYY-MM
+
+            // Filter quotes for today
+            const quotesToday = quotes.filter(q => {
+                if (!q.createdAt) return false;
+                const quoteDate = new Date(q.createdAt).toISOString().slice(0, 10);
+                return quoteDate === todayStr;
+            });
+
+            // Filter quotes for this month
+            const quotesThisMonth = quotes.filter(q => {
+                if (!q.createdAt) return false;
+                const quoteMonth = new Date(q.createdAt).toISOString().slice(0, 7);
+                return quoteMonth === monthStr;
+            });
+
+            // Calculate total estimated value for today
+            const valueToday = quotesToday.reduce((sum, quote) => {
+                return sum + calculateQuoteValue(quote);
+            }, 0);
+
+            // Count unique clients this month
+            const uniqueClients = new Set();
+            quotesThisMonth.forEach(quote => {
+                if (quote.contactInfo && quote.contactInfo.name) {
+                    uniqueClients.add(quote.contactInfo.name.toLowerCase().trim());
+                }
+            });
+
+            const { quotesToday: quotesTodayList, totalValue } = getQuotesTodayAndTotal({ excludeDrafts: true });
+
+            // Update dashboard cards
+            document.getElementById('quotes-today').textContent = quotesToday.length;
+            document.getElementById('quotes-month').textContent = quotesThisMonth.length;
+           // document.getElementById('value-today').textContent = `${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} EGP`;
+            document.getElementById('new-clients').textContent = uniqueClients.size;
+        }
+
+        // Display quotes in the quotes tab
+        function displayQuotes() {
+            const quotesGrid = document.getElementById('quotesGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (quotes.length === 0) {
+                quotesGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            quotesGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            // Check if there's an active search
+            const searchInput = document.getElementById('quotesSearchInput');
+            const filterType = document.getElementById('quotesFilterType');
+            const filterDate = document.getElementById('quotesFilterDate');
+            
+            if (searchInput && (searchInput.value.trim() || filterType.value !== 'all' || filterDate.value !== 'all')) {
+                // Use filtered results
+                filterQuotes();
+            } else {
+                // Show all quotes
+                quotesGrid.innerHTML = quotes.map(quote => createQuoteCard(quote)).join('');
+            }
+        }
+
+        // Search and filter quotes functionality
+        function filterQuotes() {
+            const searchInput = document.getElementById('quotesSearchInput');
+            const filterType = document.getElementById('quotesFilterType');
+            const filterDate = document.getElementById('quotesFilterDate');
+            const searchClear = document.querySelector('#quotesSearchInput + .search-clear');
+            const searchResults = document.getElementById('quotesSearchResults');
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedType = filterType.value;
+            const selectedDate = filterDate.value;
+
+            // Show/hide clear button
+            if (searchTerm.length > 0) {
+                searchClear.style.display = 'block';
+            } else {
+                searchClear.style.display = 'none';
+            }
+
+            // Filter quotes
+            let filteredQuotes = quotes.filter(quote => {
+                // Search by quote name or customer name
+                const matchesSearch = !searchTerm || 
+                    quote.name.toLowerCase().includes(searchTerm) ||
+                    (quote.contactInfo && quote.contactInfo.name && quote.contactInfo.name.toLowerCase().includes(searchTerm));
+
+                // Filter by project type
+                const matchesType = selectedType === 'all' || quote.projectType === selectedType;
+
+                // Filter by date
+                let matchesDate = true;
+                if (selectedDate !== 'all') {
+                    const quoteDate = new Date(quote.createdAt);
+                    const today = new Date();
+                    
+                    switch (selectedDate) {
+                        case 'today':
+                            matchesDate = isSameLocalDate(quoteDate, today);
+                            break;
+                        case 'week':
+                            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            matchesDate = quoteDate >= weekAgo;
+                            break;
+                        case 'month':
+                            const monthAgo = new Date(today.getFullYear(), today.getMonth(), 1);
+                            matchesDate = quoteDate >= monthAgo;
+                            break;
+                        case 'year':
+                            const yearAgo = new Date(today.getFullYear(), 0, 1);
+                            matchesDate = quoteDate >= yearAgo;
+                            break;
+                    }
+                }
+
+                return matchesSearch && matchesType && matchesDate;
+            });
+
+            // Update display
+            displayFilteredQuotes(filteredQuotes);
+            
+            // Update search results text
+            const totalQuotes = quotes.length;
+            const filteredCount = filteredQuotes.length;
+            
+            if (searchTerm || selectedType !== 'all' || selectedDate !== 'all') {
+                searchResults.textContent = `Showing ${filteredCount} of ${totalQuotes} quotes`;
+            } else {
+                searchResults.textContent = `Showing all quotes`;
+            }
+        }
+
+        function clearQuotesSearch() {
+            const searchInput = document.getElementById('quotesSearchInput');
+            const filterType = document.getElementById('quotesFilterType');
+            const filterDate = document.getElementById('quotesFilterDate');
+            
+            searchInput.value = '';
+            filterType.value = 'all';
+            filterDate.value = 'all';
+            
+            filterQuotes();
+        }
+
+        function displayFilteredQuotes(filteredQuotes) {
+            const quotesGrid = document.getElementById('quotesGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredQuotes.length === 0) {
+                quotesGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                emptyState.querySelector('.empty-title').textContent = 'No Quotes Found';
+                emptyState.querySelector('.empty-text').textContent = 'No quotes match your search criteria. Try adjusting your search terms or filters.';
+                return;
+            }
+
+            quotesGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            quotesGrid.innerHTML = filteredQuotes.map(quote => createQuoteCard(quote)).join('');
+        }
+
+        // Clients functionality
+        function loadClients() {
+            if (currentTab === 'clients') {
+                displayClients();
+            }
+        }
+
+        function displayClients() {
+            const clientsGrid = document.getElementById('clientsGrid');
+            const emptyState = document.getElementById('clientsEmptyState');
+
+            // Extract unique clients from quotes
+            const clients = extractClientsFromQuotes();
+
+            if (clients.length === 0) {
+                clientsGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            clientsGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            clientsGrid.innerHTML = clients.map(client => createClientCard(client)).join('');
+            updateClientsCount(clients.length);
+        }
+
+        function extractClientsFromQuotes() {
+            const clientMap = new Map();
+
+            quotes.forEach(quote => {
+                if (quote.contactInfo && quote.contactInfo.name) {
+                    const clientKey = quote.contactInfo.name.toLowerCase().trim();
+                    const email = quote.contactInfo.email || '';
+                    const phone = quote.contactInfo.phone || '';
+                    const location = quote.contactInfo.location || '';
+
+                    if (!clientMap.has(clientKey)) {
+                        clientMap.set(clientKey, {
+                            name: quote.contactInfo.name,
+                            email: email,
+                            phone: phone,
+                            location: location,
+                            quotes: [],
+                            totalValue: 0,
+                            lastActivity: null
+                        });
+                    }
+
+                    const client = clientMap.get(clientKey);
+                    client.quotes.push(quote);
+                    client.totalValue += safeCalculateQuoteValue(quote);
+                    
+                    const quoteDate = new Date(quote.createdAt);
+                    if (!client.lastActivity || quoteDate > client.lastActivity) {
+                        client.lastActivity = quoteDate;
+                    }
+                }
+            });
+
+            return Array.from(clientMap.values()).sort((a, b) => b.lastActivity - a.lastActivity);
+        }
+
+        function createClientCard(client) {
+            const lastActivity = client.lastActivity ? new Date(client.lastActivity).toLocaleDateString() : 'Unknown';
+            const isActive = isClientActive(client.lastActivity);
+            const statusClass = isActive ? 'status-active' : 'status-inactive';
+            const statusText = isActive ? 'Active' : 'Inactive';
+
+            return `
+                <div class="client-card" onclick="viewClientDetails('${client.name}')">
+                    <div class="client-header">
+                        <div>
+                            <div class="client-name">${client.name}</div>
+                            ${client.email ? `<a href="mailto:${client.email}" class="client-email" onclick="event.stopPropagation()">${client.email}</a>` : ''}
+                        </div>
+                      <span class="client-status ${statusClass}">${statusText}</span>
+                    </div>
+                    
+                    <div class="client-info">
+                        <div class="client-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Phone:</span>
+                                <span class="meta-value">${client.phone || 'Not provided'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Location:</span>
+                                <span class="meta-value">${client.location || 'Not specified'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Last Activity:</span>
+                                <span class="meta-value">${lastActivity}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="client-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${client.quotes.length}</div>
+                            <div class="stat-label">Quotes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${formatCurrency(client.totalValue)}</div>
+                            <div class="stat-label">Total Value</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function isClientActive(lastActivity) {
+            if (!lastActivity) return false;
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            return new Date(lastActivity) > thirtyDaysAgo;
+        }
+
+        function filterClients() {
+            const searchInput = document.getElementById('clientsSearchInput');
+            const filterQuotes = document.getElementById('clientsFilterQuotes');
+            const searchClear = document.querySelector('#clientsSearchInput + .search-clear');
+            const searchResults = document.getElementById('clientsSearchResults');
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedFilter = filterQuotes.value;
+
+            // Show/hide clear button
+            if (searchTerm.length > 0) {
+                searchClear.style.display = 'block';
+            } else {
+                searchClear.style.display = 'none';
+            }
+
+            // Get all clients
+            const allClients = extractClientsFromQuotes();
+
+            // Filter clients
+            let filteredClients = allClients.filter(client => {
+                // Search by name, email, or phone
+                const matchesSearch = !searchTerm || 
+                    client.name.toLowerCase().includes(searchTerm) ||
+                    (client.email && client.email.toLowerCase().includes(searchTerm)) ||
+                    (client.phone && client.phone.toLowerCase().includes(searchTerm));
+
+                // Filter by activity status
+                let matchesFilter = true;
+                if (selectedFilter !== 'all') {
+                    const isActive = isClientActive(client.lastActivity);
+                    if (selectedFilter === 'active') {
+                        matchesFilter = isActive;
+                    } else if (selectedFilter === 'inactive') {
+                        matchesFilter = !isActive;
+                    }
+                }
+
+                return matchesSearch && matchesFilter;
+            });
+
+            // Update display
+            displayFilteredClients(filteredClients);
+            
+            // Update search results text
+            const totalClients = allClients.length;
+            const filteredCount = filteredClients.length;
+            
+            if (searchTerm || selectedFilter !== 'all') {
+                searchResults.textContent = `Showing ${filteredCount} of ${totalClients} clients`;
+            } else {
+                searchResults.textContent = `Showing all clients`;
+            }
+        }
+
+        function clearClientsSearch() {
+            const searchInput = document.getElementById('clientsSearchInput');
+            const filterQuotes = document.getElementById('clientsFilterQuotes');
+            
+            searchInput.value = '';
+            filterQuotes.value = 'all';
+            
+            filterClients();
+        }
+
+        function displayFilteredClients(filteredClients) {
+            const clientsGrid = document.getElementById('clientsGrid');
+            const emptyState = document.getElementById('clientsEmptyState');
+
+            if (filteredClients.length === 0) {
+                clientsGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            clientsGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            clientsGrid.innerHTML = filteredClients.map(client => createClientCard(client)).join('');
+            updateClientsCount(filteredClients.length);
+        }
+
+        function updateClientsCount(count) {
+            const clientsCountElement = document.getElementById('clientsCount');
+            if (clientsCountElement) {
+                clientsCountElement.textContent = count;
+            }
+        }
+
+        function viewClientDetails(clientName) {
+            // Filter quotes for this client
+            const clientQuotes = quotes.filter(quote => 
+                quote.contactInfo && quote.contactInfo.name && 
+                quote.contactInfo.name.toLowerCase().trim() === clientName.toLowerCase().trim()
+            );
+
+            // For now, just show the quotes in the quotes tab
+            // You could implement a more detailed client view later
+            switchTab('quotes');
+            
+            // Set search to show only this client's quotes
+            const searchInput = document.getElementById('quotesSearchInput');
+            if (searchInput) {
+                searchInput.value = clientName;
+                filterQuotes();
+            }
+        }
+
+        function exportClientsData() {
+            const clients = extractClientsFromQuotes();
+            
+            // Create CSV content
+            let csvContent = 'Name,Email,Phone,Location,Quotes Count,Total Value,Last Activity,Status\n';
+            
+            clients.forEach(client => {
+                const isActive = isClientActive(client.lastActivity);
+                const status = isActive ? 'Active' : 'Inactive';
+                const lastActivity = client.lastActivity ? new Date(client.lastActivity).toLocaleDateString() : 'Unknown';
+                
+                csvContent += `"${client.name}","${client.email || ''}","${client.phone || ''}","${client.location || ''}",${client.quotes.length},${client.totalValue},${lastActivity},${status}\n`;
+            });
+
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `clients_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'EGP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Create quote card HTML
+        function createQuoteCard(quote) {
+            const createdDate = new Date(quote.createdAt).toLocaleDateString();
+            const modifiedDate = new Date(quote.lastModified).toLocaleDateString();
+            const itemsCount = quote.items.length;
+            
+            // Create item type summary
+            const itemTypes = quote.items.reduce((acc, item) => {
+                acc[item.type] = (acc[item.type] || 0) + 1;
+                return acc;
+            }, {});
+
+            const itemTags = Object.entries(itemTypes).map(([type, count]) => 
+                `<span class="item-tag">${count} ${type.replace('_', ' ')}</span>`
+            ).join('');
+
+            return `
+                <div class="quote-card" onclick="openQuoteDetail('${quote.id}', event)">
+                    <div class="quote-header">
+                        <div>
+                            <h3 class="quote-title">${quote.name}</h3>
+                            <div class="quote-id">ID: ${quote.id}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="quote-info">
+                        <div class="quote-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Project Type</span>
+                                <span class="meta-value">${quote.projectType.charAt(0).toUpperCase() + quote.projectType.slice(1)}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Contact</span>
+                                <span class="meta-value">${quote.contactInfo.name}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Location</span>
+                                <span class="meta-value">${quote.contactInfo.location || 'Not specified'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Contact Method</span>
+                                <span class="meta-value">${quote.contactInfo.method.charAt(0).toUpperCase() + quote.contactInfo.method.slice(1)}</span>
+                            </div>
+                        </div>
+                        
+                        ${quote.description ? `
+                            <div class="quote-description">
+                                <i class="fas fa-sticky-note" style="margin-right: 8px;"></i>
+                                ${quote.description}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="quote-items">
+                            <div class="items-summary">
+                                <i class="fas fa-list"></i> ${itemsCount} item${itemsCount !== 1 ? 's' : ''}
+                            </div>
+                            <div class="item-tags">
+                                ${itemTags}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quote-footer">
+                        <div class="quote-dates">
+                            <div>Created: ${createdDate}</div>
+                            ${createdDate !== modifiedDate ? `<div>Modified: ${modifiedDate}</div>` : ''}
+                        </div>
+                        <div class="quote-buttons">
+                            <button class="btn btn-success" onclick="loadQuote('${quote.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportQuote('${quote.id}')">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-danger" onclick="showDeleteModal('${quote.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update quotes count
+        function updateQuotesCount() {
+            document.getElementById('quotesCount').textContent = quotes.length;
+            document.getElementById('totalQuotesCount').textContent = quotes.length;
+        }
+
+        // Load quote for editing
+        function loadQuote(quoteId) {
+            console.log('loadQuote called with:', quoteId);
+            try {
+                // Store the quote ID to be loaded by the target page
+                localStorage.setItem('loadQuoteId', quoteId);
+                
+                // Open the main quote page - it will automatically load the quote
+                window.open('quote-generator.html', '_blank');
+                
+                // Show success notification
+                showSuccessNotification('Opening quote for editing...');
+            } catch (error) {
+                console.error('Error loading quote:', error);
+                alert('Error loading quote. Please try again.');
+            }
+        }
+
+        // Export single quote
+        function exportQuote(quoteId) {
+            console.log('exportQuote called with:', quoteId);
+            try {
+                var quote = quotes.find(function(q) { return q.id === quoteId; });
+                if (!quote) {
+                    alert('Quote not found.');
+                    return;
+                }
+
+                var blob = new Blob([JSON.stringify(quote, null, 2)], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = quote.name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + quote.id + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showSuccessNotification('Quote exported successfully!');
+            } catch (error) {
+                console.error('Error in exportQuote:', error);
+                alert('Error exporting quote: ' + error.message);
+            }
+        }
+
+        // Export all quotes
+        function exportAllQuotes() {
+            console.log('exportAllQuotes called');
+            try {
+                if (quotes.length === 0) {
+                    alert('No quotes to export.');
+                    return;
+                }
+
+                var exportData = {
+                    exportDate: new Date().toISOString(),
+                    totalQuotes: quotes.length,
+                    quotes: quotes
+                };
+
+                var blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'cocoon_all_quotes_' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showSuccessNotification(quotes.length + ' quotes exported successfully!');
+            } catch (error) {
+                console.error('Error in exportAllQuotes:', error);
+                alert('Error exporting quotes: ' + error.message);
+            }
+        }
+
+        // Show delete modal
+        function showDeleteModal(quoteId) {
+            console.log('showDeleteModal called with:', quoteId);
+            try {
+                var quote = quotes.find(function(q) { return q.id === quoteId; });
+                if (!quote) return;
+
+                quoteToDelete = quoteId;
+                var nameElement = document.getElementById('deleteQuoteName');
+                if (nameElement) {
+                    nameElement.textContent = quote.name;
+                }
+                var modal = document.getElementById('deleteModal');
+                if (modal) {
+                    modal.classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error in showDeleteModal:', error);
+            }
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            quoteToDelete = null;
+        }
+
+        // Confirm delete
+        function confirmDelete() {
+            if (!quoteToDelete) return;
+
+            try {
+                quotes = quotes.filter(q => q.id !== quoteToDelete);
+                localStorage.setItem('cocoonQuotes', JSON.stringify(quotes));
+                
+                displayQuotes();
+                updateQuotesCount();
+                updateAnalytics();
+                closeDeleteModal();
+                
+                showSuccessNotification('Quote deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting quote:', error);
+                alert('Error deleting quote. Please try again.');
+            }
+        }
+
+        // Show clear all dialog
+        function showClearAllDialog() {
+            console.log('showClearAllDialog called');
+            try {
+                if (quotes.length === 0) {
+                    alert('No quotes to delete.');
+                    return;
+                }
+                
+                var modal = document.getElementById('clearAllModal');
+                if (modal) {
+                    modal.classList.add('active');
+                } else {
+                    console.error('clearAllModal not found');
+                }
+            } catch (error) {
+                console.error('Error in showClearAllDialog:', error);
+            }
+        }
+
+        // Close clear all modal
+        function closeClearAllModal() {
+            document.getElementById('clearAllModal').classList.remove('active');
+        }
+
+        // Confirm clear all
+        function confirmClearAll() {
+            try {
+                localStorage.removeItem('cocoonQuotes');
+                quotes = [];
+                
+                displayQuotes();
+                updateQuotesCount();
+                updateAnalytics();
+                closeClearAllModal();
+                
+                showSuccessNotification('All quotes deleted successfully!');
+            } catch (error) {
+                console.error('Error clearing quotes:', error);
+                alert('Error clearing quotes. Please try again.');
+            }
+        }
+
+        // Show success notification
+        function showSuccessNotification(message) {
+            const notification = document.getElementById('successNotification');
+            const textElement = document.getElementById('notificationText');
+            
+            textElement.textContent = message;
+            notification.classList.add('active');
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('active');
+            }, 3000);
+        }
+
+        // Listen for storage changes to update dashboard in real-time
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cocoonQuotes') {
+                loadQuotes();
+            }
+        });
+
+        // Quote Detail Modal Functions
+        let currentQuoteDetail = null;
+        let currentQuoteDetailTab = 'analysis';
+
+        // Open quote detail modal
+        function openQuoteDetail(quoteId, event) {
+            const quote = quotes.find(q => q.id === quoteId);
+            if (!quote) return;
+
+            currentQuoteDetail = quote;
+            document.getElementById('quoteDetailTitle').textContent = quote.name;
+            document.getElementById('quoteDetailModal').classList.add('active');
+            
+            // Load pricing analysis
+            loadPricingAnalysis(quote);
+            loadCustomerQuote(quote);
+            
+            // Prevent event bubbling
+            if (event) {
+                event.stopPropagation();
+            }
+        }
+
+        // Close quote detail modal
+        function closeQuoteDetailModal() {
+            document.getElementById('quoteDetailModal').classList.remove('active');
+            currentQuoteDetail = null;
+        }
+
+        // Switch quote detail tabs
+        function switchQuoteDetailTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.quote-detail-tab').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="switchQuoteDetailTab('${tabName}')"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.quote-detail-tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-content`).classList.add('active');
+            
+            currentQuoteDetailTab = tabName;
+        }
+
+        // Profile enrichment helper: merge saved/minimal profile with full sheet row
+        function enrichProfileData(profileData) {
+            try {
+                if (!profileData) {
+                    console.warn('enrichProfileData: No profile data provided');
+                    return {};
+                }
+                
+                const code = (profileData.profile_code || profileData.code || '').toString().trim();
+                const name = (profileData.profile_name || profileData.name || '').toString().trim();
+
+                console.log('enrichProfileData: Looking for profile with code:', code, 'name:', name);
+
+                // If no profiles loaded from sheets, return what we have
+                if (!Array.isArray(profiles) || profiles.length === 0) {
+                    console.warn('enrichProfileData: No profiles loaded from sheets, using saved data only');
+                    return profileData;
+                }
+
+                let sheetProfile = null;
+                
+                // Try to find by profile code first
+                if (code) {
+                    sheetProfile = profiles.find(p => String(p.profile_code || '').trim() === code);
+                    console.log('enrichProfileData: Found by code:', !!sheetProfile);
+                }
+                
+                // If not found by code, try by name
+                if (!sheetProfile && name) {
+                    sheetProfile = profiles.find(p => String(p.profile_name || '').trim() === name);
+                    console.log('enrichProfileData: Found by name:', !!sheetProfile);
+                }
+                
+                // If still not found, return original data
+                if (!sheetProfile) {
+                    console.warn('enrichProfileData: Profile not found in sheets, using saved data only');
+                    return profileData;
+                }
+
+                console.log('enrichProfileData: Found sheet profile:', sheetProfile);
+
+                // Start with saved profile data
+                const enriched = { ...profileData };
+
+                // Prefer non-zero numeric fields from sheet when missing/zero in saved profile
+                const numericKeys = [
+                    'frame_price','frame_price_3','leaf_price',
+                    'accessories_2_leaves','accessories_3_leaves','accessories_4_leaves',
+                    'glass_price_single','glass_price_double',
+                    'arc_price','net_price','net_price_plisse','net_price_panda',
+                    'base_profit_rate'
+                ];
+
+                numericKeys.forEach(k => {
+                    const curVal = Number(enriched[k] || 0);
+                    const sheetVal = Number(sheetProfile[k] || 0);
+                    const curHas = Number.isFinite(curVal) && curVal > 0;
+                    const sheetHas = Number.isFinite(sheetVal) && sheetVal > 0;
+                    
+                    // Use sheet value if current value is missing/zero and sheet has a value
+                    if (!curHas && sheetHas) {
+                        enriched[k] = sheetVal;
+                        console.log(`enrichProfileData: Using sheet value for ${k}:`, sheetVal);
+                    }
+                });
+
+                // Fill descriptive fields if missing
+                ['Brand','brand','system','profile_name','profile_code','max_h','max_w'].forEach(k => {
+                    if (!enriched[k] && sheetProfile[k]) {
+                        enriched[k] = sheetProfile[k];
+                        console.log(`enrichProfileData: Using sheet value for ${k}:`, sheetProfile[k]);
+                    }
+                });
+
+                // Backfill "price" when only frame_price exists
+                if ((enriched.price == null || Number(enriched.price) === 0) && Number(enriched.frame_price)) {
+                    enriched.price = enriched.frame_price;
+                    console.log('enrichProfileData: Set price from frame_price:', enriched.price);
+                }
+
+                // Ensure we have a default profit rate if none specified
+                if (!enriched.base_profit_rate || Number(enriched.base_profit_rate) === 0) {
+                    enriched.base_profit_rate = 0.3; // Default 30%
+                    console.log('enrichProfileData: Set default profit rate:', enriched.base_profit_rate);
+                }
+
+                console.log('enrichProfileData: Final enriched profile:', enriched);
+                return enriched;
+            } catch (e) {
+                console.error('enrichProfileData error:', e);
+                return profileData || {};
+            }
+        }
+
+        // Build a verbose "how it was calculated" HTML block per item
+        function buildPricingExplanationHtml(item) {
+            try {
+                const fmt = (n) => Number(n ?? 0).toLocaleString();
+                const pct = (n) => (Number(n ?? 0) * 100).toFixed(2) + '%';
+                let html = '<details class="pricing-explain" style="margin-top:10px;"><summary style="cursor:pointer;font-weight:600;color:#A72036;">How this was calculated</summary><div style="margin-top:10px;font-size:0.9rem;">';
+                if ((item.type || '').toLowerCase() === 'curtain_wall') {
+                    const p = item.profile || {};
+                    const baseRate = Number(p.base_profit_rate || 0);
+                    const extraArea = Math.max(0, Math.ceil((Number(item.glassArea || 0)) - 4));
+                    const profitRate = baseRate + extraArea * 0.1;
+                    html += `
+                        <div>Inputs</div>
+                        <ul>
+                            <li>Frame meters: ${fmt(item.frameMeters)}</li>
+                            <li>Window/Door meters: ${fmt(item.windowMeters)}</li>
+                            <li>Glass area: ${fmt(item.glassArea)} m²</li>
+                            <li>Windows: ${fmt(item.numWindows)}, Doors: ${fmt(item.numDoors)}, Corners: ${fmt(item.cornerCount)}</li>
+                        </ul>
+                        <div>Rates</div>
+                        <ul>
+                            <li>Frame price per meter: ${fmt(p.frame_price)} EGP</li>
+                            <li>Window/Door price per meter: ${fmt(p.leaf_price)} EGP</li>
+                            <li>Accessories per window/door: ${fmt(p.accessories_2_leaves)} EGP</li>
+                            <li>Frame accessories per meter: ${fmt(p.accessories_3_leaves)} EGP</li>
+                            <li>Corner accessory per corner: ${fmt(p.accessories_4_leaves)} EGP</li>
+                        </ul>
+                        <div>Unit calculations (before quantity)</div>
+                        <ul>
+                            <li>Frame cost = frameMeters × frame_price = ${fmt(item.frameMeters)} × ${fmt(p.frame_price)} = ${fmt(Number(item.frameMeters||0)*Number(p.frame_price||0))} EGP</li>
+                            <li>Windows cost = windowMeters × leaf_price = ${fmt(item.windowMeters)} × ${fmt(p.leaf_price)} = ${fmt(Number(item.windowMeters||0)*Number(p.leaf_price||0))} EGP</li>
+                            <li>Accessories (windows/doors) = (windows + doors) × accessories_2_leaves = (${fmt(item.numWindows)} + ${fmt(item.numDoors)}) × ${fmt(p.accessories_2_leaves)} = ${fmt((Number(item.numWindows||0)+Number(item.numDoors||0))*Number(p.accessories_2_leaves||0))} EGP</li>
+                            <li>Frame accessories = frameMeters × accessories_3_leaves = ${fmt(item.frameMeters)} × ${fmt(p.accessories_3_leaves)} = ${fmt(Number(item.frameMeters||0)*Number(p.accessories_3_leaves||0))} EGP</li>
+                            <li>Corners = cornerCount × accessories_4_leaves = ${fmt(item.cornerCount)} × ${fmt(p.accessories_4_leaves)} = ${fmt(Number(item.cornerCount||0)*Number(p.accessories_4_leaves||0))} EGP</li>
+                        </ul>
+                        <div>Profit</div>
+                        <ul>
+                            <li>Base profit rate: ${pct(baseRate)}</li>
+                            <li>Extra area above 4 m²: ceil(glassArea - 4) = ${fmt(extraArea)} → added ${(extraArea*0.1).toFixed(2)} to rate</li>
+                            <li>Final profit rate: ${(profitRate*100).toFixed(2)}%</li>
+                        </ul>
+                        <div>Totals</div>
+                        <ul>
+                            <li>Subtotal (unit) = ${fmt(Number(item.totalBeforeProfit || 0) / Number(item.quantity || 1))} EGP</li>
+                            <li>Profit (unit) = ${fmt(Number(item.profitAmount || 0) / Number(item.quantity || 1))} EGP</li>
+                            <li>Quantity = ${fmt(item.quantity || 1)}</li>
+                            <li>Total price = ${fmt(item.totalPrice || 0)} EGP</li>
+                            <li>Price per m² = ${fmt(item.m2Price || 0)} EGP/m²</li>
+                        </ul>
+                    `;
+                } else {
+                    const p = item.profile || {};
+                    const baseRate = Number(p.base_profit_rate || 0);
+                    const areaUnit = Number(item.area || 0) / Number(item.quantity || 1) || 0;
+                    const extraArea = areaUnit > 4 ? Math.ceil(areaUnit - 4) : 0;
+                    const profitRate = baseRate + extraArea * 0.1;
+                    const netLine = Number(item.netCost || 0) > 0 ? `<li>Net cost = leafPerimeter × net price = ${fmt(item.leafPerimeter)} × ${fmt(p.net_price || p.net_price_plisse || p.net_price_panda || 0)} = ${fmt(Number(item.netCost||0)/Number(item.quantity||1))} EGP (unit)</li>` : '';
+                    const archLine = item.arch ? `<li>Arch cost = arc_price × ${item.type==='door'?'3':'4'} = ${fmt(p.arc_price)} × ${item.type==='door'?'3':'4'} = ${fmt(Number(item.archCost||0)/Number(item.quantity||1))} EGP (unit)</li>` : '';
+                    const glassRate = (String(item.glassType||'single').toLowerCase()==='double') ? Number(p.glass_price_double||0) : Number(p.glass_price_single||0);
+                    html += `
+                        <div>Inputs</div>
+                        <ul>
+                            <li>Width × Height = ${fmt(item.width)} m × ${fmt(item.height)} m</li>
+                            <li>Area (unit) = ${fmt(areaUnit)} m²</li>
+                            <li>Leaves = ${fmt(item.leaves)}</li>
+                            <li>Leaf perimeter (unit) = ${fmt(item.leafPerimeter)} m</li>
+                            <li>Total leaf length (unit) = ${fmt(item.totalLeafLength)} m</li>
+                        </ul>
+                        <div>Rates</div>
+                        <ul>
+                            <li>Frame price (perimeter) = ${fmt(item.leaves===3 ? p.frame_price_3 : p.frame_price)} EGP</li>
+                            <li>Leaf price per meter = ${fmt(p.leaf_price)} EGP</li>
+                            <li>Glass rate (${String(item.glassType||'single').toLowerCase()}) = ${fmt(glassRate)} EGP/m²</li>
+                            <li>Accessories (by leaves) = ${fmt(item.leaves===2?p.accessories_2_leaves:item.leaves===3?p.accessories_3_leaves:p.accessories_4_leaves)} EGP</li>
+                        </ul>
+                        <div>Unit calculations (before quantity)</div>
+                        <ul>
+                            <li>Frame cost = frameLength × frame_price = ${fmt(Number(item.frameLength||0)/Number(item.quantity||1))} × ${fmt(item.leaves===3 ? p.frame_price_3 : p.frame_price)} = ${fmt(Number(item.frameCost||0)/Number(item.quantity||1))} EGP</li>
+                            <li>Leaf cost = totalLeafLength × leaf_price = ${fmt(Number(item.totalLeafLength||0)/Number(item.quantity||1))} × ${fmt(p.leaf_price)} = ${fmt(Number(item.leafCost||0)/Number(item.quantity||1))} EGP</li>
+                            <li>Glass cost = area × glass_rate = ${fmt(areaUnit)} × ${fmt(glassRate)} = ${fmt(Number(item.glassCost||0)/Number(item.quantity||1))} EGP</li>
+                            ${netLine}
+                            ${archLine}
+                        </ul>
+                        <div>Profit</div>
+                        <ul>
+                            <li>Base profit rate: ${pct(baseRate)}</li>
+                            <li>Extra area above 4 m²: ceil(area - 4) = ${fmt(extraArea)} → added ${(extraArea*0.1).toFixed(2)} to rate</li>
+                            <li>Final profit rate: ${(profitRate*100).toFixed(2)}%</li>
+                        </ul>
+                    `;
+                }
+                html += '</div></details>';
+                return html;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // Load pricing analysis with sophisticated n8n-based calculations
+        function loadPricingAnalysis(quote) {
+            const pricingOverview = document.getElementById('pricingOverview');
+            const detailedBreakdown = document.getElementById('detailedBreakdown');
+            
+            console.log('Loading pricing analysis for quote:', quote);
+            
+            try {
+                // Process items using the n8n pricing formula with proper data structure mapping
+                const pricedItems = quote.items.map(raw => {
+                    // Clone so we don't mutate original input object
+                    const item = JSON.parse(JSON.stringify(raw));
+                    
+                    console.log('Processing item for pricing:', item);
+                    
+                    // FIXED: Better quantity handling for saved quotes
+                    let qty = 1;
+                    if (item.type === 'curtain_wall') {
+                        // For curtain walls, check multiple possible locations for quantity
+                        qty = Number(
+                            item.quantity || 
+                            item.curtain?.quantity || 
+                            (item.designData && item.designData.quantity) ||
+                            1
+                        );
+                    } else {
+                        // For normal items
+                        qty = Number(item.quantity || 1);
+                    }
+                    
+                    // FIXED: Better profile data handling for saved quotes
+                    let profileData = null;
+                    
+                    if (item.type === 'curtain_wall') {
+                        // For curtain walls, profile might be in different locations
+                        profileData = item.profile || item.curtain?.profile || {};
+                    } else {
+                        // For normal items
+                        profileData = item.profile || {};
+                    }
+                    
+                    // FIXED: Handle saved quote profile structure vs live profile structure
+                    if (profileData && typeof profileData === 'object') {
+                        // If it's a saved quote profile (simplified structure), try to enrich it
+                        if (profileData.code && !profileData.profile_code) {
+                            profileData.profile_code = profileData.code;
+                        }
+                        if (profileData.name && !profileData.profile_name) {
+                            profileData.profile_name = profileData.name;
+                        }
+                        if (profileData.brand && !profileData.Brand) {
+                            profileData.Brand = profileData.brand;
+                        }
+                        if (profileData.price && !profileData.frame_price) {
+                            profileData.frame_price = profileData.price;
+                        }
+                    }
+                    
+                    // Enrich profile data with full sheet data if available
+                    const enrichedProfile = enrichProfileData(profileData);
+                    
+                    console.log('Profile data for item:', {
+                        original: profileData,
+                        enriched: enrichedProfile
+                    });
+                    
+                    // FIXED: Ensure we have a complete profile structure
+                    const p = {
+                        profile_code: enrichedProfile.profile_code || enrichedProfile.code || '',
+                        brand: enrichedProfile.Brand || enrichedProfile.brand || '',
+                        profile_name: enrichedProfile.profile_name || enrichedProfile.name || '',
+                        frame_price: Number(enrichedProfile.frame_price || enrichedProfile.price || 0),
+                        frame_price_3: Number(enrichedProfile.frame_price_3 || 0),
+                        leaf_price: Number(enrichedProfile.leaf_price || 0),
+                        accessories_2_leaves: Number(enrichedProfile.accessories_2_leaves || 0),
+                        accessories_3_leaves: Number(enrichedProfile.accessories_3_leaves || 0),
+                        accessories_4_leaves: Number(enrichedProfile.accessories_4_leaves || 0),
+                        glass_price_single: Number(enrichedProfile.glass_price_single || 0),
+                        glass_price_double: Number(enrichedProfile.glass_price_double || 0),
+                        arc_price: Number(enrichedProfile.arc_price || 0),
+                        net_price: Number(enrichedProfile.net_price || 0),
+                        net_price_plisse: Number(enrichedProfile.net_price_plisse || 0),
+                        net_price_panda: Number(enrichedProfile.net_price_panda || 0),
+                        base_profit_rate: Number(enrichedProfile.base_profit_rate || 0.3) // Default 30% if not specified
+                    };
+                    
+                    console.log('Final profile structure:', p);
+                    
+                    // CURTAIN WALL: FIXED LOGIC with better data access
+                    if (item.type === "curtain_wall") {
+                        // FIXED: Better fallback chain for curtain wall data
+                        const frameMeters = Number(
+                            item.frameMeters || 
+                            (item.designData && item.designData.frameMeters) ||
+                            0
+                        );
+                        const windowMeters = Number(
+                            item.windowMeters || 
+                            (item.designData && item.designData.windowMeters) ||
+                            0
+                        );
+                        const glassArea = Number(
+                            item.glassArea || 
+                            (item.designData && item.designData.glassArea) ||
+                            0
+                        );
+                        
+                        // FIXED: Better panels array access
+                        let panels = [];
+                        if (Array.isArray(item.panels)) {
+                            panels = item.panels;
+                        } else if (item.designData && Array.isArray(item.designData.panels)) {
+                            panels = item.designData.panels;
+                        }
+                        
+                        const numWindows = panels.filter(pl => String(pl?.type).toLowerCase() === 'window').length;
+                        const numDoors = panels.filter(pl => String(pl?.type).toLowerCase() === 'door').length;
+                        const cornerCount = Number(
+                            item.cornerCount || 
+                            (item.designData && item.designData.cornerCount) ||
+                            0
+                        );
+                            
+                        // Area is always glass m²
+                        const totalAreaUnit = glassArea;
+                        
+                        // Determine per-meter rates - use profile data directly
+                        const framePricePerMeter = p.frame_price;
+                        const windowPricePerMeter = p.leaf_price;
+                        
+                        // Accessory unit prices
+                        const accessoriesPerWindowDoor = p.accessories_2_leaves || 0;
+                        const frameAccessoriesPerMeter = p.accessories_3_leaves || 0;
+                        const cornerAccessory = p.accessories_4_leaves || 0;
+                        
+                        // Component costs
+                        const frameCostUnit = framePricePerMeter * frameMeters;
+                        const windowsCostUnit = windowPricePerMeter * windowMeters;
+                        const accessoriesWinDoorUnit = (numWindows + numDoors) * accessoriesPerWindowDoor;
+                        const frameAccessoriesUnit = frameMeters * frameAccessoriesPerMeter;
+                        const cornersUnit = cornerCount * cornerAccessory;
+                        
+                        // Subtotal before profit
+                        const totalBeforeProfitUnit = frameCostUnit + windowsCostUnit + accessoriesWinDoorUnit + frameAccessoriesUnit + cornersUnit;
+                        
+                        // Profit calculation
+                        let profitRate = Number(p.base_profit_rate || 0.3);
+                        
+                        // Add extra 0.1 per m² above 4 (like doors/windows)
+                        const extraArea = totalAreaUnit > 4 ? Math.ceil(totalAreaUnit - 4) : 0;
+                        profitRate += extraArea * 0.1;
+                        
+                        const profitAmountUnit = profitRate * totalBeforeProfitUnit;
+                        const totalPriceUnit = totalBeforeProfitUnit + profitAmountUnit;
+                        
+                        const denomArea = (totalAreaUnit > 0 ? totalAreaUnit : 1);
+                        
+                        console.log('Curtain wall calculations:', {
+                            frameMeters, windowMeters, glassArea, qty,
+                            frameCostUnit, windowsCostUnit, totalBeforeProfitUnit,
+                            profitRate, profitAmountUnit, totalPriceUnit
+                        });
+                        
+                        return {
+                            ...item,
+                            quantity: qty,
+                            frameMeters,
+                            windowMeters,
+                            glassArea,
+                            totalArea: totalAreaUnit,
+                            numWindows,
+                            numDoors,
+                            cornerCount,
+                            
+                            // Breakdown
+                            frameCost: +(frameCostUnit * qty).toFixed(2),
+                            windowsCost: +(windowsCostUnit * qty).toFixed(2),
+                            accessoriesWindowsDoors: +(accessoriesWinDoorUnit * qty).toFixed(2),
+                            frameAccessories: +(frameAccessoriesUnit * qty).toFixed(2),
+                            cornersCost: +(cornersUnit * qty).toFixed(2),
+                            
+                            // Totals
+                            totalBeforeProfit: +(totalBeforeProfitUnit * qty).toFixed(2),
+                            base_profit_rate: +profitRate.toFixed(4),
+                            profitAmount: +(profitAmountUnit * qty).toFixed(2),
+                            totalPrice: +(totalPriceUnit * qty).toFixed(2),
+                            
+                            // Derived metrics
+                            m2Price: +((totalPriceUnit / denomArea)).toFixed(2),
+                            profitPercentage: +((totalPriceUnit ? (profitAmountUnit / totalPriceUnit) * 100 : 0)).toFixed(2),
+                            area: +(totalAreaUnit * qty).toFixed(2),
+                            
+                            // Keep these for compatibility
+                            netCost: 0,
+                            archCost: 0,
+                            frameLength: 0,
+                            leafPerimeter: 0,
+                            totalLeafLength: 0,
+                            
+                            // Store profile for reference
+                            profile: p
+                        };
+                    }
+                    
+                    // DOORS + WINDOWS: FIXED with better data handling
+                    const originalWidth = Number(item.width || 0);
+                    const originalHeight = Number(item.height || 0);
+                    const leaves = Number(item.leaves || 2);
+                    
+                    // FIXED: Handle zero dimensions
+                    if (originalWidth === 0 || originalHeight === 0) {
+                        console.warn('Item has zero dimensions:', item);
+                        return {
+                            ...item,
+                            quantity: qty,
+                            width: originalWidth,
+                            height: originalHeight,
+                            area: 0,
+                            totalBeforeProfit: 0,
+                            profitAmount: 0,
+                            totalPrice: 0,
+                            m2Price: 0,
+                            profitPercentage: 0,
+                            profile: p,
+                            error: 'Invalid dimensions'
+                        };
+                    }
+                    
+                    const calcWidth = originalWidth < 1 ? 1 : originalWidth;
+                    const calcHeight = originalHeight < 1 ? 1 : originalHeight;
+                    
+                    const areaUnit = calcWidth * calcHeight;
+                    const frameLengthUnit = 2 * (calcWidth + calcHeight);
+                    const leafPerimeter = 2 * ((calcWidth / leaves) + calcHeight);
+                    const totalLeafLengthUnit = leafPerimeter * leaves;
+                    
+                    let accessoriesUnit = 0;
+                    if (leaves === 2) accessoriesUnit = p.accessories_2_leaves;
+                    else if (leaves === 3) accessoriesUnit = p.accessories_3_leaves;
+                    else if (leaves === 4) accessoriesUnit = p.accessories_4_leaves;
+                    
+                    const selectedFramePrice = leaves === 3 ? p.frame_price_3 : p.frame_price;
+                    const frameCostUnit = selectedFramePrice * frameLengthUnit;
+                    const leafCostUnit = p.leaf_price * totalLeafLengthUnit;
+                    
+                    const glassType = (item.glassType || 'double').toLowerCase();
+                    const glassRate = glassType === "double" ? p.glass_price_double : p.glass_price_single;
+                    const glassCostUnit = glassRate * areaUnit;
+                    
+                    let netCostUnit = 0;
+                    if ((item.system || '').toLowerCase() === "hinged" && item.mosquito) {
+                        const netType = (item.netType || '').toLowerCase();
+                        if (netType === "fixed") {
+                            netCostUnit = p.net_price * leafPerimeter;
+                        } else if (netType === "plisse") {
+                            netCostUnit = p.net_price_plisse * leafPerimeter;
+                        } else if (netType === "panda") {
+                            netCostUnit = p.net_price_panda * leafPerimeter;
+                        }
+                    }
+                    
+                    let archMultiplier = 4;
+                    if (item.type === "door") archMultiplier = 3;
+                    const archCostUnit = item.arch ? p.arc_price * archMultiplier : 0;
+                    
+                    const totalBeforeProfitUnit = accessoriesUnit + frameCostUnit + leafCostUnit + glassCostUnit + netCostUnit + archCostUnit;
+                    let profitRate = Number(p.base_profit_rate || 0.3);
+                    const extraArea = areaUnit > 4 ? Math.ceil(areaUnit - 4) : 0;
+                    profitRate += extraArea * 0.1;
+                    
+                    const profitAmountUnit = profitRate * totalBeforeProfitUnit;
+                    const totalPriceUnit = totalBeforeProfitUnit + profitAmountUnit;
+                    
+                    console.log('Normal item calculations:', {
+                        width: originalWidth, height: originalHeight, leaves, qty,
+                        areaUnit, frameCostUnit, leafCostUnit, glassCostUnit,
+                        totalBeforeProfitUnit, profitRate, profitAmountUnit, totalPriceUnit
+                    });
+                    
+                    return {
+                        ...item,
+                        quantity: qty,
+                        width: originalWidth,
+                        height: originalHeight,
+                        frameLength: +(frameLengthUnit * qty).toFixed(2),
+                        leafPerimeter: +leafPerimeter.toFixed(2),
+                        totalLeafLength: +(totalLeafLengthUnit * qty).toFixed(2),
+                        area: +(areaUnit * qty).toFixed(2),
+                        accessories: +(accessoriesUnit * qty).toFixed(2),
+                        frameCost: +(frameCostUnit * qty).toFixed(2),
+                        leafCost: +(leafCostUnit * qty).toFixed(2),
+                        glassCost: +(glassCostUnit * qty).toFixed(2),
+                        netCost: +(netCostUnit * qty).toFixed(2),
+                        archCost: +(archCostUnit * qty).toFixed(2),
+                        totalBeforeProfit: +(totalBeforeProfitUnit * qty).toFixed(2),
+                        base_profit_rate: +profitRate.toFixed(4),
+                        profitAmount: +(profitAmountUnit * qty).toFixed(2),
+                        totalPrice: +(totalPriceUnit * qty).toFixed(2),
+                        m2Price: +(totalPriceUnit / (areaUnit || 1)).toFixed(2),
+                        profitPercentage: +((profitAmountUnit / totalPriceUnit) * 100).toFixed(2),
+                        
+                        // Store profile for reference
+                        profile: p
+                    };
+                });
+                
+                const totalM2 = pricedItems.reduce((sum, i) => sum + Number(i.area || 0), 0);
+                const totalBefore = pricedItems.reduce((sum, i) => sum + Number(i.totalBeforeProfit || 0), 0);
+                const totalAfter = pricedItems.reduce((sum, i) => sum + Number(i.totalPrice || 0), 0);
+                const totalProfit = totalAfter - totalBefore;
+                const totalProfitPercentage = totalAfter ? (totalProfit / totalAfter) * 100 : 0;
+                const totalM2Price = totalM2 ? (totalAfter / totalM2) : 0;
+
+                // Create pricing overview cards
+                pricingOverview.innerHTML = `
+                    <div class="pricing-card">
+                        <div class="pricing-card-icon"><i class="fas fa-calculator"></i></div>
+                        <div class="pricing-card-value">${totalBefore.toLocaleString()} EGP</div>
+                        <div class="pricing-card-label">Total Cost</div>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-card-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="pricing-card-value">${totalProfit.toLocaleString()} EGP</div>
+                        <div class="pricing-card-label">Total Profit</div>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-card-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="pricing-card-value">${totalAfter.toLocaleString()} EGP</div>
+                        <div class="pricing-card-label">Total Value</div>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-card-icon"><i class="fas fa-percentage"></i></div>
+                        <div class="pricing-card-value">${totalProfitPercentage.toFixed(1)}%</div>
+                        <div class="pricing-card-label">Profit Margin</div>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-card-icon"><i class="fas fa-ruler-combined"></i></div>
+                        <div class="pricing-card-value">${totalM2.toFixed(1)} m²</div>
+                        <div class="pricing-card-label">Total Area</div>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-card-icon"><i class="fas fa-coins"></i></div>
+                        <div class="pricing-card-value">${totalM2Price.toLocaleString()} EGP</div>
+                        <div class="pricing-card-label">Price per m²</div>
+                    </div>
+                `;
+
+                // Create detailed breakdown with explanations
+                detailedBreakdown.innerHTML = pricedItems.map(item => {
+                    let itemContent = `
+                        <div class="breakdown-item">
+                            <div class="breakdown-item-header">
+                                <div class="breakdown-item-title">${item.type.charAt(0).toUpperCase() + item.type.slice(1)} (${item.uniqueId || item.id})</div>
+                                <div class="breakdown-item-total">${(item.totalPrice || 0).toLocaleString()} EGP</div>
+                            </div>
+                            <div class="breakdown-details">
+                    `;
+
+                    if (item.type === 'curtain_wall') {
+                        itemContent += `
+                            <div class="breakdown-detail">
+                                <span>Glass Area:</span>
+                                <span>${(item.glassArea || 0).toFixed(2)} m²</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Frame Cost:</span>
+                                <span>${(item.frameCost || 0).toLocaleString()} EGP</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Windows Cost:</span>
+                                <span>${(item.windowsCost || 0).toLocaleString()} EGP</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Accessories:</span>
+                                <span>${(item.accessoriesWindowsDoors || 0).toLocaleString()} EGP</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Frame Accessories:</span>
+                                <span>${(item.frameAccessories || 0).toLocaleString()} EGP</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Corners:</span>
+                                <span>${(item.cornersCost || 0).toLocaleString()} EGP</span>
+                            </div>
+                        `;
+                    } else {
+                        itemContent += `
+                            <div class="breakdown-detail">
+                                <span>Dimensions:</span>
+                                <span>${item.width}m × ${item.height}m</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Area:</span>
+                                <span>${(item.area || 0).toFixed(2)} m²</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Frame Cost:</span>
+                                <span>${(item.frameCost || 0).toLocaleString()} EGP</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Leaf Cost:</span>
+                                <span>${(item.leafCost || 0).toLocaleString()} EGP</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Glass Cost:</span>
+                                <span>${(item.glassCost || 0).toLocaleString()} EGP</span>
+                            </div>
+                            <div class="breakdown-detail">
+                                <span>Accessories:</span>
+                                <span>${(item.accessories || 0).toLocaleString()} EGP</span>
+                            </div>
+                        `;
+                        
+                        if (item.netCost && item.netCost > 0) {
+                            itemContent += `
+                                <div class="breakdown-detail">
+                                    <span>Net Cost:</span>
+                                    <span>${item.netCost.toLocaleString()} EGP</span>
+                                </div>
+                            `;
+                        }
+                        
+                        if (item.archCost && item.archCost > 0) {
+                            itemContent += `
+                                <div class="breakdown-detail">
+                                    <span>Arch Cost:</span>
+                                    <span>${item.archCost.toLocaleString()} EGP</span>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    itemContent += `
+                                <div class="breakdown-detail">
+                                    <span>Subtotal:</span>
+                                    <span>${(item.totalBeforeProfit || 0).toLocaleString()} EGP</span>
+                                </div>
+                                <div class="breakdown-detail">
+                                    <span>Profit (${((item.base_profit_rate || 0) * 100).toFixed(1)}%):</span>
+                                    <span>${(item.profitAmount || 0).toLocaleString()} EGP</span>
+                                </div>
+                                <div class="breakdown-detail">
+                                    <span>Total Price:</span>
+                                    <span>${(item.totalPrice || 0).toLocaleString()} EGP</span>
+                                </div>
+                                <div class="breakdown-detail">
+                                    <span>Price per m²:</span>
+                                    <span>${(item.m2Price || 0).toLocaleString()} EGP/m²</span>
+                                </div>
+                            </div>
+                            ${buildPricingExplanationHtml(item)}
+                        </div>
+                    `;
+                    
+                    return itemContent;
+                }).join('');
+
+                // Create simple charts (using basic canvas drawing)
+                createCostChart(pricedItems.map(item => ({
+                    name: `${item.type.charAt(0).toUpperCase() + item.type.slice(1)} (${item.uniqueId || item.id})`,
+                    total: item.totalPrice || 0
+                })));
+                createProfitChart(totalBefore, totalProfit);
+
+            } catch (error) {
+                console.error('Error in pricing analysis:', error);
+                
+                // Fallback to basic calculation
+                pricingOverview.innerHTML = `
+                    <div class="pricing-card">
+                        <div class="pricing-card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="pricing-card-value">Error</div>
+                        <div class="pricing-card-label">Pricing calculation failed</div>
+                    </div>
+                `;
+                
+                detailedBreakdown.innerHTML = `
+                    <div class="breakdown-item">
+                        <div class="breakdown-item-header">
+                            <div class="breakdown-item-title">Pricing Error</div>
+                        </div>
+                        <div class="breakdown-details">
+                            <p>Unable to calculate detailed pricing. Please check that all items have valid profile data.</p>
+                            <p>Error: ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Load customer quote
+        function loadCustomerQuote(quote) {
+            const customerQuote = document.getElementById('customerQuote');
+            const createdDate = new Date(quote.createdAt).toLocaleDateString();
+            
+            // Calculate total value
+            let totalValue = 0;
+            quote.items.forEach(item => {
+                if (item.profile && item.profile.price) {
+                    const price = parseFloat(item.profile.price) || 0;
+                    const quantity = parseInt(item.quantity) || 1;
+                    
+                    if (item.type === 'curtain_wall') {
+                        const frameMeters = item.designData?.frameMeters || 0;
+                        const windowMeters = item.designData?.windowMeters || 0;
+                        totalValue += (frameMeters + windowMeters) * price * quantity * 1.3; // Include profit
+                    } else {
+                        const width = parseFloat(item.width) || 0;
+                        const height = parseFloat(item.height) || 0;
+                        const area = width * height;
+                        totalValue += area * price * quantity * 1.3; // Include profit
+                    }
+                }
+            });
+
+            customerQuote.innerHTML = `
+              
+                
+                <div class="quote-content-section">
+                    <div class="quote-info-grid">
+                        <div class="quote-info-section">
+                            <h4 class="quote-info-title">
+                                <i class="fas fa-file-alt"></i> Quote Information
+                            </h4>
+                            <div class="quote-info-item">
+                                <span>Quote ID:</span>
+                                <span>${quote.id}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Quote Name:</span>
+                                <span>${quote.name}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Date:</span>
+                                <span>${createdDate}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Project Type:</span>
+                                <span>${quote.projectType.charAt(0).toUpperCase() + quote.projectType.slice(1)}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Valid Until:</span>
+                                <span>${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quote-info-section">
+                            <h4 class="quote-info-title">
+                                <i class="fas fa-user"></i> Customer Information
+                            </h4>
+                            <div class="quote-info-item">
+                                <span>Name:</span>
+                                <span>${quote.contactInfo.name}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Phone:</span>
+                                <span>${quote.contactInfo.phone}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Email:</span>
+                                <span>${quote.contactInfo.email}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Location:</span>
+                                <span>${quote.contactInfo.location || 'Not specified'}</span>
+                            </div>
+                            <div class="quote-info-item">
+                                <span>Contact Method:</span>
+                                <span>${quote.contactInfo.method.charAt(0).toUpperCase() + quote.contactInfo.method.slice(1)}</span>
+                            </div>
+                        </div>
+                    </div> 
+            `;
+        }
+
+        // Create simple cost distribution chart
+        function createCostChart(itemBreakdowns) {
+            const canvas = document.getElementById('costChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (itemBreakdowns.length === 0) {
+                ctx.fillStyle = '#666';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+            
+            // Simple pie chart
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 20;
+            
+            const total = itemBreakdowns.reduce((sum, item) => sum + item.total, 0);
+            let currentAngle = 0;
+            
+            const colors = ['#A72036', '#F9BC77', '#303038', '#28a745', '#17a2b8', '#ffc107'];
+            
+            itemBreakdowns.forEach((item, index) => {
+                const sliceAngle = (item.total / total) * 2 * Math.PI;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.fill();
+                
+                // Add label
+                const labelAngle = currentAngle + sliceAngle / 2;
+                const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
+                const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${((item.total / total) * 100).toFixed(1)}%`, labelX, labelY);
+                
+                currentAngle += sliceAngle;
+            });
+        }
+
+        // Create simple profit analysis chart
+        function createProfitChart(totalCost, totalProfit) {
+            const canvas = document.getElementById('profitChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Simple bar chart
+            const barWidth = 80;
+            const maxHeight = canvas.height - 60;
+            const maxValue = Math.max(totalCost, totalProfit);
+            
+            if (maxValue === 0) {
+                ctx.fillStyle = '#666';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+            
+            // Cost bar
+            const costHeight = (totalCost / maxValue) * maxHeight;
+            ctx.fillStyle = '#A72036';
+            ctx.fillRect(canvas.width / 2 - barWidth - 10, canvas.height - costHeight - 30, barWidth, costHeight);
+            
+            // Profit bar
+            const profitHeight = (totalProfit / maxValue) * maxHeight;
+            ctx.fillStyle = '#28a745';
+            ctx.fillRect(canvas.width / 2 + 10, canvas.height - profitHeight - 30, barWidth, profitHeight);
+            
+            // Labels
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Cost', canvas.width / 2 - barWidth / 2 - 10, canvas.height - 10);
+            ctx.fillText('Profit', canvas.width / 2 + barWidth / 2 + 10, canvas.height - 10);
+            
+            // Values
+            ctx.font = '12px Arial';
+            ctx.fillText(`${totalCost.toLocaleString()}`, canvas.width / 2 - barWidth / 2 - 10, canvas.height - costHeight - 35);
+            ctx.fillText(`${totalProfit.toLocaleString()}`, canvas.width / 2 + barWidth / 2 + 10, canvas.height - profitHeight - 35);
+        }
+
+        // Enhanced Export functions using the new export page
+        function exportQuoteToPDF() {
+            if (!currentQuoteDetail) return;
+            
+            // Open the enhanced export page with the current quote
+            const exportUrl = `enhanced-quote-export-movable-fixed.html?quoteId=${currentQuoteDetail.id}`;
+            const exportWindow = window.open(exportUrl, '_blank', 'width=1200,height=800');
+            
+            // Pass the current quote data to the export window
+            if (exportWindow) {
+                exportWindow.currentQuoteDetail = currentQuoteDetail;
+                exportWindow.profiles = profiles; // Pass profiles for pricing calculations
+            }
+            
+            showSuccessNotification('Enhanced export page opened - choose your export options');
+        }
+
+        function printQuote() {
+            if (!currentQuoteDetail) return;
+            
+            // Open the enhanced export page with the current quote
+            const exportUrl = `enhanced-quote-export.html?quoteId=${currentQuoteDetail.id}`;
+            const exportWindow = window.open(exportUrl, '_blank', 'width=1200,height=800');
+            
+            // Pass the current quote data to the export window
+            if (exportWindow) {
+                exportWindow.currentQuoteDetail = currentQuoteDetail;
+                exportWindow.profiles = profiles; // Pass profiles for pricing calculations
+                
+                // Auto-trigger print after a short delay
+                setTimeout(() => {
+                    if (exportWindow && !exportWindow.closed) {
+                        exportWindow.focus();
+                        exportWindow.print();
+                    }
+                }, 2000);
+            }
+            
+            showSuccessNotification('Print-ready export page opened');
+        }
+
+        function emailQuote() {
+            if (!currentQuoteDetail) return;
+            
+            // Open the enhanced export page first
+            const exportUrl = `enhanced-quote-export.html?quoteId=${currentQuoteDetail.id}`;
+            const exportWindow = window.open(exportUrl, '_blank', 'width=1200,height=800');
+            
+            // Pass the current quote data to the export window
+            if (exportWindow) {
+                exportWindow.currentQuoteDetail = currentQuoteDetail;
+                exportWindow.profiles = profiles; // Pass profiles for pricing calculations
+            }
+            
+            // Also prepare email content
+            const subject = `Quote: ${currentQuoteDetail.name}`;
+            const body = `Dear ${currentQuoteDetail.contactInfo.name},
+
+Please find your detailed quote for the aluminum work project.
+
+Quote Details:
+- Quote ID: ${currentQuoteDetail.id}
+- Project Type: ${currentQuoteDetail.projectType}
+- Items: ${currentQuoteDetail.items.length}
+- Location: ${currentQuoteDetail.contactInfo.location}
+
+This quote is valid for 3 days from the date of issue.
+
+You can print this quote as a PDF from the export page that just opened.
+
+Best regards,
+Cocoon Aluminum Works
+Phone: +20 11 51717149
+Email: sales.department@cocoonaluminum.com
+Website: www.cocoonaluminum.com`;
+
+            const mailtoLink = `mailto:${currentQuoteDetail.contactInfo.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Open email client after a short delay
+            setTimeout(() => {
+                window.open(mailtoLink);
+            }, 1000);
+            
+            showSuccessNotification('Export page opened and email client prepared');
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                if (event.target.id === 'deleteModal') {
+                    closeDeleteModal();
+                } else if (event.target.id === 'clearAllModal') {
+                    closeClearAllModal();
+                }
+            }
+            
+            // Handle quote detail modal (different class structure)
+            if (event.target.id === 'quoteDetailModal') {
+                closeQuoteDetailModal();
+            }
+        });
+
+        // Helper: parse date safely and compare local date parts (year,month,day)
+function parseLocalDate(isoOrTimestamp) {
+    const d = new Date(isoOrTimestamp);
+    return isNaN(d) ? null : d;
+}
+
+function isSameLocalDate(aDateObj, bDateObj) {
+    return aDateObj.getFullYear() === bDateObj.getFullYear() &&
+           aDateObj.getMonth() === bDateObj.getMonth() &&
+           aDateObj.getDate() === bDateObj.getDate();
+}
+
+// Robust wrapper around calculateQuoteValue to always return a Number
+function safeCalculateQuoteValue(quote) {
+    try {
+        const val = Number(calculateQuoteValue(quote) || 0);
+        return Number.isFinite(val) ? val : 0;
+    } catch (e) {
+        console.warn('safeCalculateQuoteValue error for', quote && quote.id, e);
+        return 0;
+    }
+}
+
+/**
+ * Returns an object { quoteLineItems: [{id,name,value}], totalValue }
+ * Options:
+ *  - excludeDrafts: true => ignore quotes with quote.status === 'draft' (if you use status)
+ */
+function getQuotesTodayAndTotal({ excludeDrafts = true } = {}) {
+    const today = new Date(); // local today
+    // find quotes that were created today in local time
+    const matches = [];
+
+    for (let i = 0; i < quotes.length; i++) {
+        const q = quotes[i];
+        if (!q || !q.createdAt) continue;
+
+        // optional: skip draft quotes if your app uses a status field
+        if (excludeDrafts && (q.status && q.status.toLowerCase() === 'draft')) continue;
+
+        const created = parseLocalDate(q.createdAt);
+        if (!created) continue;
+
+        if (isSameLocalDate(created, today)) {
+            const value = safeCalculateQuoteValue(q);
+            matches.push({
+                id: q.id,
+                name: q.name || 'Unnamed quote',
+                value: Number(value)
+            });
+        }
+    }
+
+    const totalValue = matches.reduce((s, r) => s + r.value, 0);
+
+    return {
+        quotesToday: matches,
+        totalValue: Number(totalValue)
+    };
+}
+
+    </script>
+</html>

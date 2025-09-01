@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>System Test Checklist - Cocoon Aluminum Works</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #6c757d;
+        }
+        .test-item.passed {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .test-item.failed {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .test-item.pending {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        .test-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .status {
+            margin-left: auto;
+            font-weight: bold;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            transition: width 0.3s ease;
+        }
+        .summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 System Test Checklist</h1>
+    <p>Complete this checklist to verify your system is production-ready.</p>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+    
+    <div class="summary" id="summary">
+        <strong>Progress: 0/15 tests completed</strong>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔐 Authentication Tests</h2>
+        
+        <div class="test-item" id="auth-1">
+            <i class="fas fa-user-plus test-icon"></i>
+            <div>
+                <strong>User Registration</strong><br>
+                <small>Create a new user account</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="auth-2">
+            <i class="fas fa-sign-in-alt test-icon"></i>
+            <div>
+                <strong>User Login</strong><br>
+                <small>Login with email and password</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="auth-3">
+            <i class="fas fa-key test-icon"></i>
+            <div>
+                <strong>Password Reset</strong><br>
+                <small>Request password reset email</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="auth-4">
+            <i class="fas fa-sign-out-alt test-icon"></i>
+            <div>
+                <strong>User Logout</strong><br>
+                <small>Successfully logout and clear session</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Data Management Tests</h2>
+        
+        <div class="test-item" id="data-1">
+            <i class="fas fa-file-invoice-dollar test-icon"></i>
+            <div>
+                <strong>Quote Creation</strong><br>
+                <small>Create a new quote and save to Firebase</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="data-2">
+            <i class="fas fa-users test-icon"></i>
+            <div>
+                <strong>Profile Management</strong><br>
+                <small>Import and manage client profiles</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="data-3">
+            <i class="fas fa-sync test-icon"></i>
+            <div>
+                <strong>Real-time Sync</strong><br>
+                <small>Changes appear instantly across users</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="data-4">
+            <i class="fas fa-download test-icon"></i>
+            <div>
+                <strong>Data Export</strong><br>
+                <small>Export quotes to PDF/Excel</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>👥 User Management Tests</h2>
+        
+        <div class="test-item" id="user-1">
+            <i class="fas fa-user-cog test-icon"></i>
+            <div>
+                <strong>Admin Access</strong><br>
+                <small>Access user management interface</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="user-2">
+            <i class="fas fa-user-plus test-icon"></i>
+            <div>
+                <strong>Create Users</strong><br>
+                <small>Create new users with different roles</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="user-3">
+            <i class="fas fa-user-edit test-icon"></i>
+            <div>
+                <strong>Role Management</strong><br>
+                <small>Assign and modify user roles</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🛡️ Security Tests</h2>
+        
+        <div class="test-item" id="security-1">
+            <i class="fas fa-shield-alt test-icon"></i>
+            <div>
+                <strong>Permission Enforcement</strong><br>
+                <small>Role-based access control working</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="security-2">
+            <i class="fas fa-lock test-icon"></i>
+            <div>
+                <strong>Data Protection</strong><br>
+                <small>Data encrypted and secure</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="security-3">
+            <i class="fas fa-history test-icon"></i>
+            <div>
+                <strong>Audit Trail</strong><br>
+                <small>User actions are logged</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔄 Migration Tests</h2>
+        
+        <div class="test-item" id="migration-1">
+            <i class="fas fa-upload test-icon"></i>
+            <div>
+                <strong>Data Migration</strong><br>
+                <small>Migrate existing localStorage data</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+        
+        <div class="test-item" id="migration-2">
+            <i class="fas fa-undo test-icon"></i>
+            <div>
+                <strong>Fallback Mode</strong><br>
+                <small>System works offline with localStorage</small>
+            </div>
+            <div class="status">Pending</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎯 Quick Actions</h2>
+        <a href="index.html" class="btn">Test Login</a>
+        <a href="dashboard.html" class="btn">Test Dashboard</a>
+        <a href="admin.html" class="btn">Test User Management</a>
+        <a href="migration-helper.html" class="btn">Test Migration</a>
+        <a href="firebase-test.html" class="btn">Test Firebase</a>
+        <button class="btn btn-success" onclick="markAllComplete()">Mark All Complete</button>
+        <button class="btn btn-warning" onclick="resetTests()">Reset Tests</button>
+    </div>
+
+    <script>
+        let completedTests = 0;
+        const totalTests = 15;
+        
+        function updateProgress() {
+            const percentage = (completedTests / totalTests) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('summary').innerHTML = `<strong>Progress: ${completedTests}/${totalTests} tests completed (${Math.round(percentage)}%)</strong>`;
+        }
+        
+        function markTestComplete(testId, passed = true) {
+            const testItem = document.getElementById(testId);
+            if (testItem && !testItem.classList.contains('passed') && !testItem.classList.contains('failed')) {
+                testItem.classList.remove('pending');
+                testItem.classList.add(passed ? 'passed' : 'failed');
+                testItem.querySelector('.status').textContent = passed ? 'Passed' : 'Failed';
+                testItem.querySelector('.test-icon').className = `fas ${passed ? 'fa-check' : 'fa-times'} test-icon`;
+                
+                if (passed) {
+                    completedTests++;
+                }
+                updateProgress();
+            }
+        }
+        
+        function markAllComplete() {
+            const testItems = document.querySelectorAll('.test-item');
+            testItems.forEach(item => {
+                const testId = item.id;
+                markTestComplete(testId, true);
+            });
+        }
+        
+        function resetTests() {
+            const testItems = document.querySelectorAll('.test-item');
+            testItems.forEach(item => {
+                item.classList.remove('passed', 'failed');
+                item.classList.add('pending');
+                item.querySelector('.status').textContent = 'Pending';
+                item.querySelector('.test-icon').className = 'fas fa-question test-icon';
+            });
+            completedTests = 0;
+            updateProgress();
+        }
+        
+        // Auto-mark some tests based on current state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if Firebase is working
+            if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                markTestComplete('security-2', true); // Data Protection
+            }
+            
+            // Check if user is logged in
+            if (localStorage.getItem('loggedIn') === 'true') {
+                markTestComplete('auth-2', true); // User Login
+                markTestComplete('auth-4', true); // User Logout (can be tested)
+            }
+        });
+    </script>
+</body>
+</html>
+

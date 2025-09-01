@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Role Fixer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .user-list {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .role-admin {
+            background: #dc3545;
+            color: white;
+        }
+        .role-user {
+            background: #6c757d;
+            color: white;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body>
+    <h1>🔧 Admin Role Fixer</h1>
+    <p>This tool helps fix admin roles and prevent them from being overwritten.</p>
+    
+    <div id="status-container">
+        <div class="status-box warning">
+            <strong>Loading...</strong><br>
+            Please wait while we check your current setup.
+        </div>
+    </div>
+    
+    <div id="actions" style="display: none;">
+        <h2>Quick Actions</h2>
+        <button class="btn btn-success" onclick="fixCurrentUserRole()">Fix My Role to Admin</button>
+        <button class="btn btn-warning" onclick="loadAllUsers()">View All Users</button>
+        <button class="btn" onclick="checkCurrentUser()">Check My Current Role</button>
+        <a href="admin-setup-verification.html" class="btn">Admin Verification</a>
+    </div>
+    
+    <div id="user-list" class="user-list" style="display: none;">
+        <h3>All Users</h3>
+        <div id="users-container">Loading users...</div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkSetup();
+        });
+        
+        async function checkSetup() {
+            const container = document.getElementById('status-container');
+            container.innerHTML = '';
+            
+            try {
+                // Initialize Firebase Auth
+                await FirebaseAuth.initializeAuth();
+                currentUser = FirebaseAuth.getCurrentUser();
+                
+                if (!currentUser) {
+                    addStatus('warning', '⚠️ Not Logged In', 'Please log in first to use this tool.');
+                    showActions();
+                    return;
+                }
+                
+                addStatus('success', '✅ User Authenticated', `Logged in as: ${currentUser.email}`);
+                
+                // Check current user role
+                await checkCurrentUserRole();
+                
+            } catch (error) {
+                addStatus('error', '❌ Setup Error', error.message);
+            }
+        }
+        
+        async function checkCurrentUserRole() {
+            try {
+                const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                
+                if (!userDoc.exists) {
+                    addStatus('warning', '⚠️ No User Profile', 'Your user profile does not exist. Creating one with admin role...');
+                    await createAdminProfile();
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                const userRole = userData.role || 'user';
+                
+                if (userRole === 'admin') {
+                    addStatus('success', '✅ Admin Role Confirmed', `Your role is: ${userRole}`);
+                } else {
+                    addStatus('warning', '⚠️ Limited Role', `Your role is: ${userRole}. Click "Fix My Role to Admin" to upgrade.`);
+                }
+                
+                showActions();
+                
+            } catch (error) {
+                addStatus('error', '❌ Role Check Failed', error.message);
+            }
+        }
+        
+        async function createAdminProfile() {
+            try {
+                const userProfile = {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    displayName: currentUser.displayName || '',
+                    role: 'admin',
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    isActive: true
+                };
+                
+                await firebase.firestore().collection('users').doc(currentUser.uid).set(userProfile);
+                addStatus('success', '✅ Admin Profile Created', 'Your admin profile has been created successfully.');
+                showActions();
+                
+            } catch (error) {
+                addStatus('error', '❌ Profile Creation Failed', error.message);
+            }
+        }
+        
+        async function fixCurrentUserRole() {
+            try {
+                await firebase.firestore().collection('users').doc(currentUser.uid).update({
+                    role: 'admin',
+                    lastModified: new Date().toISOString()
+                });
+                
+                addStatus('success', '✅ Role Updated to Admin', 'Your role has been successfully updated to admin.');
+                await checkCurrentUserRole();
+                
+            } catch (error) {
+                addStatus('error', '❌ Role Update Failed', error.message);
+            }
+        }
+        
+        async function loadAllUsers() {
+            try {
+                const usersSnapshot = await firebase.firestore().collection('users').get();
+                const users = [];
+                
+                usersSnapshot.forEach(doc => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+                
+                displayUsers(users);
+                
+            } catch (error) {
+                addStatus('error', '❌ Failed to Load Users', error.message);
+            }
+        }
+        
+        function displayUsers(users) {
+            const container = document.getElementById('users-container');
+            const userList = document.getElementById('user-list');
+            
+            if (users.length === 0) {
+                container.innerHTML = '<p>No users found.</p>';
+            } else {
+                const usersHtml = users.map(user => `
+                    <div class="user-item">
+                        <div>
+                            <strong>${user.displayName || 'No Name'}</strong><br>
+                            <small>${user.email}</small>
+                        </div>
+                        <div>
+                            <span class="role-badge role-${user.role || 'user'}">${user.role || 'user'}</span>
+                            ${user.id === currentUser.uid ? ' <small>(You)</small>' : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = usersHtml;
+            }
+            
+            userList.style.display = 'block';
+        }
+        
+        async function checkCurrentUser() {
+            await checkCurrentUserRole();
+        }
+        
+        function addStatus(type, title, message) {
+            const container = document.getElementById('status-container');
+            const statusBox = document.createElement('div');
+            statusBox.className = `status-box ${type}`;
+            statusBox.innerHTML = `<strong>${title}</strong><br>${message}`;
+            container.appendChild(statusBox);
+        }
+        
+        function showActions() {
+            document.getElementById('actions').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

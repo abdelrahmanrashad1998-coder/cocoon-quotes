@@ -1,0 +1,20 @@
+# TEMPORARY TEST MODE - Firestore Security Rules
+# Use these rules ONLY for testing and development
+# DO NOT use in production!
+# 
+# To apply these rules:
+# 1. Go to Firebase Console > Firestore Database > Rules
+# 2. Replace current rules with the content below
+# 3. Click "Publish"
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // TEMPORARY: Allow all access for testing
+    // This will resolve the permission issues
+    // REMEMBER: Switch back to production rules after fixing admin role
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

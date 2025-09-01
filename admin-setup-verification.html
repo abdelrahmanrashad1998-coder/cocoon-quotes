@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Setup Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+</head>
+<body>
+    <h1>🔧 Admin Setup Verification</h1>
+    
+    <div id="status-container">
+        <div class="status-box warning">
+            <strong>Checking setup...</strong><br>
+            Please wait while we verify your admin configuration.
+        </div>
+    </div>
+    
+    <div id="actions" style="display: none;">
+        <h2>Quick Actions</h2>
+        <a href="index.html" class="btn">Go to Login</a>
+        <a href="admin.html" class="btn">User Management</a>
+        <a href="dashboard.html" class="btn">Dashboard</a>
+        <a href="firebase-test.html" class="btn">Firebase Test</a>
+        <button class="btn" onclick="checkPermissions()">Recheck Permissions</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkSetup();
+        });
+        
+        async function checkSetup() {
+            const container = document.getElementById('status-container');
+            container.innerHTML = '';
+            
+            // Check 1: Firebase Connection
+            try {
+                if (typeof firebase === 'undefined' || !firebase.apps.length) {
+                    addStatus('error', '❌ Firebase not initialized', 'Firebase SDK is not loaded or configured properly.');
+                    return;
+                }
+                addStatus('success', '✅ Firebase Connected', 'Firebase is properly initialized.');
+            } catch (error) {
+                addStatus('error', '❌ Firebase Error', error.message);
+                return;
+            }
+            
+            // Check 2: Authentication
+            try {
+                await FirebaseAuth.initializeAuth();
+                const currentUser = FirebaseAuth.getCurrentUser();
+                
+                if (!currentUser) {
+                    addStatus('warning', '⚠️ Not Logged In', 'Please log in to verify admin access.');
+                    showActions();
+                    return;
+                }
+                
+                addStatus('success', '✅ User Authenticated', `Logged in as: ${currentUser.email}`);
+            } catch (error) {
+                addStatus('error', '❌ Authentication Error', error.message);
+                return;
+            }
+            
+            // Check 3: User Role
+            try {
+                const currentUser = FirebaseAuth.getCurrentUser();
+                const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                
+                if (!userDoc.exists) {
+                    addStatus('error', '❌ User Profile Missing', 'Your user profile does not exist in the database. Please contact an administrator.');
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                const userRole = userData.role || 'user';
+                
+                if (userRole === 'admin') {
+                    addStatus('success', '✅ Admin Access Confirmed', `Your role is: ${userRole}`);
+                } else {
+                    addStatus('warning', '⚠️ Limited Access', `Your role is: ${userRole}. Admin access required for full functionality.`);
+                }
+                
+                addStatus('info', '📋 User Details', `
+                    Email: ${userData.email}<br>
+                    Display Name: ${userData.displayName || 'Not set'}<br>
+                    Role: ${userRole}<br>
+                    Created: ${new Date(userData.createdAt).toLocaleDateString()}
+                `);
+                
+            } catch (error) {
+                addStatus('error', '❌ Permission Check Failed', error.message);
+                return;
+            }
+            
+            // Check 4: Database Access
+            try {
+                const testDoc = await firebase.firestore().collection('quotes').limit(1).get();
+                addStatus('success', '✅ Database Access', 'Can read from Firestore database.');
+            } catch (error) {
+                addStatus('error', '❌ Database Access Denied', error.message);
+            }
+            
+            showActions();
+        }
+        
+        function addStatus(type, title, message) {
+            const container = document.getElementById('status-container');
+            const statusBox = document.createElement('div');
+            statusBox.className = `status-box ${type}`;
+            statusBox.innerHTML = `<strong>${title}</strong><br>${message}`;
+            container.appendChild(statusBox);
+        }
+        
+        function showActions() {
+            document.getElementById('actions').style.display = 'block';
+        }
+        
+        async function checkPermissions() {
+            document.getElementById('status-container').innerHTML = '';
+            addStatus('warning', '🔄 Rechecking...', 'Verifying permissions...');
+            await checkSetup();
+        }
+    </script>
+</body>
+</html>
+

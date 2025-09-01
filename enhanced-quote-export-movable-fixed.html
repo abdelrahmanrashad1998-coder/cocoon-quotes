@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<link href="https://db.onlinewebfonts.com/c/28c0ba929947563500b21da15a88c6fe?family=TacticSans-Reg" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cocoon Aluminum Works - Enhanced Quote Export</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+        /* Enhanced Export Styles - Based on provided template */
+        :root {
+            --cocoon-primary: #A72036;
+            --cocoon-dark: #303038;
+            --cocoon-light: #F9BC77;
+            --cocoon-white: #FFFFFF;
+            --cocoon-light-bg: #f8f8f8;
+        }
+
+        body {
+            margin: 30px;
+            font-family: "TacticSans-Reg", sans-serif;
+            color: #111;
+            background: #fff;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #800000;
+            padding-bottom: 10px;
+        }
+
+        .logo {
+            width: 140px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #800000;
+            text-transform: uppercase;
+        }
+
+        .info-block {
+            margin-top: 25px;
+            background: #f6f6f6;
+            border-left: 5px solid #800000;
+            padding: 15px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .info-block p {
+            margin: 6px 0;
+        }
+
+        .totals {
+            margin: 30px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            justify-content: space-between;
+            background: #fff6f6;
+            padding: 15px;
+            border: 1px solid #e6bcbc;
+            border-radius: 6px;
+        }
+
+        .totals div {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .totals .currency-value {
+            font-weight: bold;
+            color: #800000;
+            font-size: 16px;
+            margin-top: 3px;
+        }
+        
+        .payment {
+            margin: 30px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            justify-content: space-between;
+            background: #fff6f6;
+            padding: 15px;
+            border: 1px solid #e6bcbc;
+            border-radius: 6px;
+        }
+
+        .payment div {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .payment .currency-value {
+            font-weight: bold;
+            color: #800000;
+            font-size: 16px;
+            margin-top: 3px;
+        }
+
+        .valid {
+            margin: 30px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            justify-content: space-between;
+            background: #fff6f6;
+            padding: 15px;
+            border: 1px solid #e6bcbc;
+            border-radius: 6px;
+        }
+
+        .valid div {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .valid .currency-value {
+            font-weight: bold;
+            color: #800000;
+            font-size: 16px;
+            margin-top: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #800000;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .glass-double {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .glass-single {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .tag-net {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+
+        .tag-arch {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            text-align: center;
+            color: #555;
+        }
+
+        .footer-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #800000;
+            margin-bottom: 5px;
+        }
+        
+        .notes {
+            margin-top: 50px;
+            padding-top: 20px;
+            font-size: 15px;
+            text-align: center;
+            color: #555;
+        }
+        
+        .notes-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #800000;
+            margin-bottom: 5px;
+        }
+
+        .cw-export-inner svg {
+            width: 100%;
+            height: auto;
+            max-width: 75%;
+        }
+
+        .currency-value {
+            font-weight: bold;
+            color: #800000;
+        }
+
+        /* Print styles - Fix color and layout issues */
+        @media print {
+            body {
+                margin: 0;
+                padding: 20px;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+            
+            /* Ensure colors print correctly */
+            .header {
+                border-bottom: 2px solid #800000 !important;
+            }
+            
+            th {
+                background: #800000 !important;
+                color: #fff !important;
+            }
+            
+            .currency-value {
+                color: #800000 !important;
+            }
+            
+            .info-block {
+                background: #f6f6f6 !important;
+                border-left: 5px solid #800000 !important;
+            }
+            
+            .totals, .payment, .valid {
+                background: #fff6f6 !important;
+                border: 1px solid #e6bcbc !important;
+            }
+            
+           
+            
+            .glass-double {
+                background: #e3f2fd !important;
+                color: #0d47a1 !important;
+            }
+            
+            .glass-single {
+                background: #e8f5e9 !important;
+                color: #1b5e20 !important;
+            }
+            
+            .tag-net {
+                background: #ffe0b2 !important;
+                color: #e65100 !important;
+            }
+            
+            .tag-arch {
+                background: #f3e5f5 !important;
+                color: #6a1b9a !important;
+            }
+        }
+
+        /* Export controls */
+        .export-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .export-controls h3 {
+            margin: 0 0 15px 0;
+            color: var(--cocoon-primary);
+        }
+
+        .export-btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            background: var(--cocoon-primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: "TacticSans-Reg", sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .export-btn:hover {
+            background: #8a1a2c;
+            transform: translateY(-2px);
+        }
+
+        .export-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        .pricing-option {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid var(--cocoon-primary);
+        }
+
+        .pricing-option label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .pricing-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .pricing-description {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #666;
+            margin-left: 24px;
+        }
+
+        .notes-editor {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid var(--cocoon-primary);
+        }
+
+        .notes-editor label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--cocoon-primary);
+        }
+
+        .notes-editor textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: "TacticSans-Reg", sans-serif;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .notes-editor textarea:focus {
+            outline: none;
+            border-color: var(--cocoon-primary);
+            box-shadow: 0 0 0 2px rgba(167, 32, 54, 0.1);
+        }
+
+        .quote-settings {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid var(--cocoon-primary);
+        }
+
+        .quote-settings h4 {
+            margin: 0 0 12px 0;
+            color: var(--cocoon-primary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .setting-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-row label {
+            flex: 1;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .setting-row input {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: "TacticSans-Reg", sans-serif;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .setting-row input:focus {
+            outline: none;
+            border-color: var(--cocoon-primary);
+            box-shadow: 0 0 0 2px rgba(167, 32, 54, 0.1);
+        }
+
+        .setting-row .unit {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+<!-- Export Controls -->
+<div class="export-controls no-print">
+<h3><i class="fas fa-cog"></i> Export Options</h3>
+<div class="pricing-option">
+<label>
+<input checked="" name="pricingType" type="radio" value="totals"/>
+                Show Totals Only
+            </label>
+<div class="pricing-description">
+                Display only final totals 
+            </div>
+</div>
+<div class="pricing-option">
+<label>
+<input name="pricingType" type="radio" value="detailed"/>
+                Show Detailed Pricing
+            </label>
+<div class="pricing-description">
+                Include individual item prices 
+            </div>
+</div>
+<div class="notes-editor">
+<label for="customNotes">
+<i class="fas fa-sticky-note"></i> Custom Notes
+            </label>
+<textarea id="customNotes" placeholder="Enter custom notes for this quote (e.g., special installation requirements, warranty details, etc.)">Standard aluminum work installation with professional finishing.</textarea>
+</div>
+<div class="quote-settings">
+<h4><i class="fas fa-cog"></i> Quote Settings</h4>
+<div class="setting-row">
+<label for="expirationDays">Quote Expiration:</label>
+<input id="expirationDays" type="number" value="3" min="1" max="30" />
+<span class="unit">days</span>
+</div>
+<div class="setting-row">
+<label for="projectDuration">Project Duration:</label>
+<input id="projectDuration" type="number" value="30" min="1" max="365" />
+<span class="unit">days</span>
+</div>
+<div class="setting-row">
+<label for="discountPercentage">Discount:</label>
+<input id="discountPercentage" type="number" value="0" min="0" max="50" step="0.5" />
+<span class="unit">%</span>
+</div>
+</div>
+<button class="export-btn" onclick="exportToPDF()">
+<i class="fas fa-file-pdf"></i> Export to PDF
+        </button>
+<button class="export-btn" onclick="printQuote()">
+<i class="fas fa-print"></i> Print Quote
+        </button>
+<!-- <button class="export-btn" onclick="emailQuote()">
+<i class="fas fa-envelope"></i> Email Quote
+        </button> -->
+<button class="export-btn" onclick="window.close()" style="background: #6c757d;">
+<i class="fas fa-times"></i> Close
+        </button>
+</div>
+<!-- Quote Content -->
+<div id="quote-content">
+<!-- Content will be populated by JavaScript -->
+</div>
+<script>
+        // Global variables
+        let currentQuote = null;
+        let profiles = [];
+
+        // Load quote data from URL parameters or localStorage
+        function loadQuoteData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const quoteId = urlParams.get('quoteId');
+            
+            if (quoteId) {
+                // Load from localStorage
+                const quotes = JSON.parse(localStorage.getItem('cocoonQuotes') || '[]');
+                currentQuote = quotes.find(q => q.id === quoteId);
+            } else {
+                // Try to get from opener window
+                if (window.opener && window.opener.currentQuoteDetail) {
+                    currentQuote = window.opener.currentQuoteDetail;
+                }
+            }
+            
+            if (currentQuote) {
+                generateQuoteHTML();
+            } else {
+                document.getElementById('quote-content').innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <h2 style="color: var(--cocoon-primary);">No Quote Data Found</h2>
+                        <p>Unable to load quote data. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Enhanced profile enrichment
+        function enrichProfileData(profileData) {
+            if (!profileData) return {};
+            
+            // If we have access to profiles from parent window, use them
+            if (window.opener && window.opener.profiles && window.opener.profiles.length > 0) {
+                profiles = window.opener.profiles;
+            }
+            
+            const code = (profileData.profile_code || profileData.code || '').toString().trim();
+            const name = (profileData.profile_name || profileData.name || '').toString().trim();
+
+            if (!Array.isArray(profiles) || profiles.length === 0) {
+                return profileData;
+            }
+
+            let sheetProfile = profiles.find(p => String(p.profile_code || '').trim() === code);
+            if (!sheetProfile && name) {
+                sheetProfile = profiles.find(p => String(p.profile_name || '').trim() === name);
+            }
+            
+            if (!sheetProfile) return profileData;
+
+            const enriched = { ...profileData };
+            const numericKeys = [
+                'frame_price','frame_price_3','leaf_price',
+                'accessories_2_leaves','accessories_3_leaves','accessories_4_leaves',
+                'glass_price_single','glass_price_double',
+                'arc_price','net_price','net_price_plisse','net_price_panda',
+                'base_profit_rate'
+            ];
+
+            numericKeys.forEach(k => {
+                const curVal = Number(enriched[k] || 0);
+                const sheetVal = Number(sheetProfile[k] || 0);
+                if (curVal === 0 && sheetVal > 0) {
+                    enriched[k] = sheetVal;
+                }
+            });
+
+            ['Brand','brand','system','profile_name','profile_code','max_h','max_w'].forEach(k => {
+                if (!enriched[k] && sheetProfile[k]) {
+                    enriched[k] = sheetProfile[k];
+                }
+            });
+
+            if (!enriched.base_profit_rate || Number(enriched.base_profit_rate) === 0) {
+                enriched.base_profit_rate = 0.3;
+            }
+
+            return enriched;
+        }
+
+        // Calculate detailed pricing using n8n formula
+        function calculateDetailedPricing(quote) {
+            const pricedItems = quote.items.map(raw => {
+                const item = JSON.parse(JSON.stringify(raw));
+                
+                let qty = 1;
+                if (item.type === 'curtain_wall') {
+                    qty = Number(item.quantity || item.curtain?.quantity || 1);
+                } else {
+                    qty = Number(item.quantity || 1);
+                }
+                
+                let profileData = null;
+                if (item.type === 'curtain_wall') {
+                    profileData = item.profile || item.curtain?.profile || {};
+                } else {
+                    profileData = item.profile || {};
+                }
+                
+                if (profileData && typeof profileData === 'object') {
+                    if (profileData.code && !profileData.profile_code) {
+                        profileData.profile_code = profileData.code;
+                    }
+                    if (profileData.name && !profileData.profile_name) {
+                        profileData.profile_name = profileData.name;
+                    }
+                    if (profileData.brand && !profileData.Brand) {
+                        profileData.Brand = profileData.brand;
+                    }
+                    if (profileData.price && !profileData.frame_price) {
+                        profileData.frame_price = profileData.price;
+                    }
+                }
+                
+                const enrichedProfile = enrichProfileData(profileData);
+                
+                const p = {
+                    profile_code: enrichedProfile.profile_code || enrichedProfile.code || '',
+                    brand: enrichedProfile.Brand || enrichedProfile.brand || '',
+                    profile_name: enrichedProfile.profile_name || enrichedProfile.name || '',
+                    frame_price: Number(enrichedProfile.frame_price || enrichedProfile.price || 0),
+                    frame_price_3: Number(enrichedProfile.frame_price_3 || 0),
+                    leaf_price: Number(enrichedProfile.leaf_price || 0),
+                    accessories_2_leaves: Number(enrichedProfile.accessories_2_leaves || 0),
+                    accessories_3_leaves: Number(enrichedProfile.accessories_3_leaves || 0),
+                    accessories_4_leaves: Number(enrichedProfile.accessories_4_leaves || 0),
+                    glass_price_single: Number(enrichedProfile.glass_price_single || 0),
+                    glass_price_double: Number(enrichedProfile.glass_price_double || 0),
+                    arc_price: Number(enrichedProfile.arc_price || 0),
+                    net_price: Number(enrichedProfile.net_price || 0),
+                    net_price_plisse: Number(enrichedProfile.net_price_plisse || 0),
+                    net_price_panda: Number(enrichedProfile.net_price_panda || 0),
+                    base_profit_rate: Number(enrichedProfile.base_profit_rate || 0.3)
+                };
+                
+                // CURTAIN WALL CALCULATION
+                if (item.type === "curtain_wall") {
+                    const frameMeters = Number(item.frameMeters || (item.designData && item.designData.frameMeters) || 0);
+                    const windowMeters = Number(item.windowMeters || (item.designData && item.designData.windowMeters) || 0);
+                    const glassArea = Number(item.glassArea || (item.designData && item.designData.glassArea) || 0);
+                    
+                    let panels = [];
+                    if (Array.isArray(item.panels)) {
+                        panels = item.panels;
+                    } else if (item.designData && Array.isArray(item.designData.panels)) {
+                        panels = item.designData.panels;
+                    }
+                    
+                    const numWindows = panels.filter(pl => String(pl?.type).toLowerCase() === 'window').length;
+                    const numDoors = panels.filter(pl => String(pl?.type).toLowerCase() === 'door').length;
+                    const cornerCount = Number(item.cornerCount || (item.designData && item.designData.cornerCount) || 0);
+                        
+                    const totalAreaUnit = glassArea;
+                    const framePricePerMeter = p.frame_price;
+                    const windowPricePerMeter = p.leaf_price;
+                    const accessoriesPerWindowDoor = p.accessories_2_leaves || 0;
+                    const frameAccessoriesPerMeter = p.accessories_3_leaves || 0;
+                    const cornerAccessory = p.accessories_4_leaves || 0;
+                    
+                    const frameCostUnit = framePricePerMeter * frameMeters;
+                    const windowsCostUnit = windowPricePerMeter * windowMeters;
+                    const accessoriesWinDoorUnit = (numWindows + numDoors) * accessoriesPerWindowDoor;
+                    const frameAccessoriesUnit = frameMeters * frameAccessoriesPerMeter;
+                    const cornersUnit = cornerCount * cornerAccessory;
+                    
+                    const totalBeforeProfitUnit = frameCostUnit + windowsCostUnit + accessoriesWinDoorUnit + frameAccessoriesUnit + cornersUnit;
+                    
+                    let profitRate = Number(p.base_profit_rate || 0.3);
+                    const extraArea = totalAreaUnit > 4 ? Math.ceil(totalAreaUnit - 4) : 0;
+                    profitRate += extraArea * 0.1;
+                    
+                    const profitAmountUnit = profitRate * totalBeforeProfitUnit;
+                    const totalPriceUnit = totalBeforeProfitUnit + profitAmountUnit;
+                    const denomArea = (totalAreaUnit > 0 ? totalAreaUnit : 1);
+                    
+                    return {
+                        ...item,
+                        quantity: qty,
+                        frameMeters,
+                        windowMeters,
+                        glassArea,
+                        totalArea: totalAreaUnit,
+                        numWindows,
+                        numDoors,
+                        cornerCount,
+                        frameCost: +(frameCostUnit * qty).toFixed(2),
+                        windowsCost: +(windowsCostUnit * qty).toFixed(2),
+                        accessoriesWindowsDoors: +(accessoriesWinDoorUnit * qty).toFixed(2),
+                        frameAccessories: +(frameAccessoriesUnit * qty).toFixed(2),
+                        cornersCost: +(cornersUnit * qty).toFixed(2),
+                        totalBeforeProfit: +(totalBeforeProfitUnit * qty).toFixed(2),
+                        base_profit_rate: +profitRate.toFixed(4),
+                        profitAmount: +(profitAmountUnit * qty).toFixed(2),
+                        totalPrice: +(totalPriceUnit * qty).toFixed(2),
+                        m2Price: +((totalPriceUnit / denomArea)).toFixed(2),
+                        profitPercentage: +((totalPriceUnit ? (profitAmountUnit / totalPriceUnit) * 100 : 0)).toFixed(2),
+                        area: +(totalAreaUnit * qty).toFixed(2),
+                        netCost: 0,
+                        archCost: 0,
+                        frameLength: 0,
+                        leafPerimeter: 0,
+                        totalLeafLength: 0,
+                        profile: p
+                    };
+                }
+                
+                // NORMAL ITEMS CALCULATION
+                const originalWidth = Number(item.width || 0);
+                const originalHeight = Number(item.height || 0);
+                const leaves = Number(item.leaves || 2);
+                
+                if (originalWidth === 0 || originalHeight === 0) {
+                    return {
+                        ...item,
+                        quantity: qty,
+                        width: originalWidth,
+                        height: originalHeight,
+                        area: 0,
+                        totalBeforeProfit: 0,
+                        profitAmount: 0,
+                        totalPrice: 0,
+                        m2Price: 0,
+                        profitPercentage: 0,
+                        profile: p,
+                        error: 'Invalid dimensions'
+                    };
+                }
+                
+                const calcWidth = originalWidth < 1 ? 1 : originalWidth;
+                const calcHeight = originalHeight < 1 ? 1 : originalHeight;
+                
+                const areaUnit = calcWidth * calcHeight;
+                const frameLengthUnit = 2 * (calcWidth + calcHeight);
+                const leafPerimeter = 2 * ((calcWidth / leaves) + calcHeight);
+                const totalLeafLengthUnit = leafPerimeter * leaves;
+                
+                let accessoriesUnit = 0;
+                if (leaves === 2) accessoriesUnit = p.accessories_2_leaves;
+                else if (leaves === 3) accessoriesUnit = p.accessories_3_leaves;
+                else if (leaves === 4) accessoriesUnit = p.accessories_4_leaves;
+                
+                const selectedFramePrice = leaves === 3 ? p.frame_price_3 : p.frame_price;
+                const frameCostUnit = selectedFramePrice * frameLengthUnit;
+                const leafCostUnit = p.leaf_price * totalLeafLengthUnit;
+                
+                const glassType = (item.glassType || 'double').toLowerCase();
+                const glassRate = glassType === "double" ? p.glass_price_double : p.glass_price_single;
+                const glassCostUnit = glassRate * areaUnit;
+                
+                let netCostUnit = 0;
+                if ((item.system || '').toLowerCase() === "hinged" && item.mosquito) {
+                    const netType = (item.netType || '').toLowerCase();
+                    if (netType === "fixed") {
+                        netCostUnit = p.net_price * leafPerimeter;
+                    } else if (netType === "plisse") {
+                        netCostUnit = p.net_price_plisse * leafPerimeter;
+                    } else if (netType === "panda") {
+                        netCostUnit = p.net_price_panda * leafPerimeter;
+                    }
+                }
+                
+                let archMultiplier = 4;
+                if (item.type === "door") archMultiplier = 3;
+                const archCostUnit = item.arch ? p.arc_price * archMultiplier : 0;
+                
+                const totalBeforeProfitUnit = accessoriesUnit + frameCostUnit + leafCostUnit + glassCostUnit + netCostUnit + archCostUnit;
+                let profitRate = Number(p.base_profit_rate || 0.3);
+                const extraArea = areaUnit > 4 ? Math.ceil(areaUnit - 4) : 0;
+                profitRate += extraArea * 0.1;
+                
+                const profitAmountUnit = profitRate * totalBeforeProfitUnit;
+                const totalPriceUnit = totalBeforeProfitUnit + profitAmountUnit;
+                
+                return {
+                    ...item,
+                    quantity: qty,
+                    width: originalWidth,
+                    height: originalHeight,
+                    frameLength: +(frameLengthUnit * qty).toFixed(2),
+                    leafPerimeter: +leafPerimeter.toFixed(2),
+                    totalLeafLength: +(totalLeafLengthUnit * qty).toFixed(2),
+                    area: +(areaUnit * qty).toFixed(2),
+                    accessories: +(accessoriesUnit * qty).toFixed(2),
+                    frameCost: +(frameCostUnit * qty).toFixed(2),
+                    leafCost: +(leafCostUnit * qty).toFixed(2),
+                    glassCost: +(glassCostUnit * qty).toFixed(2),
+                    netCost: +(netCostUnit * qty).toFixed(2),
+                    archCost: +(archCostUnit * qty).toFixed(2),
+                    totalBeforeProfit: +(totalBeforeProfitUnit * qty).toFixed(2),
+                    base_profit_rate: +profitRate.toFixed(4),
+                    profitAmount: +(profitAmountUnit * qty).toFixed(2),
+                    totalPrice: +(totalPriceUnit * qty).toFixed(2),
+                    m2Price: +(totalPriceUnit / (areaUnit || 1)).toFixed(2),
+                    profitPercentage: +((profitAmountUnit / totalPriceUnit) * 100).toFixed(2),
+                    profile: p
+                };
+            });
+            
+            const totalM2 = pricedItems.reduce((sum, i) => sum + Number(i.area || 0), 0);
+            const totalBefore = pricedItems.reduce((sum, i) => sum + Number(i.totalBeforeProfit || 0), 0);
+            const totalAfter = pricedItems.reduce((sum, i) => sum + Number(i.totalPrice || 0), 0);
+            const totalProfit = totalAfter - totalBefore;
+            const downPayment = totalAfter * 0.8;
+            const supplyPayment = totalAfter * 0.1;
+            const completePayment = totalAfter * 0.1;
+            
+            return {
+                items: pricedItems,
+                totals: {
+                    totalM2: +totalM2.toFixed(2),
+                    totalBefore: +totalBefore.toFixed(2),
+                    totalAfter: +totalAfter.toFixed(2),
+                    totalProfit: +totalProfit.toFixed(2),
+                    downPayment: +downPayment.toFixed(2),
+                    supplyPayment: +supplyPayment.toFixed(2),
+                    completePayment: +completePayment.toFixed(2)
+                }
+            };
+        }
+
+        // Format number with commas
+        function formatNumberWithCommas(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Generate the complete quote HTML
+        function generateQuoteHTML() {
+            const pricingType = document.querySelector('input[name="pricingType"]:checked').value;
+            const pricingData = calculateDetailedPricing(currentQuote);
+            const showDetailedPricing = pricingType === 'detailed';
+            
+            const quoteDate = new Date(currentQuote.createdAt).toISOString().split('T')[0];
+            
+            // Get values from the new controls
+            const expirationDays = parseInt(document.getElementById('expirationDays').value) || 3;
+            const projectDuration = parseInt(document.getElementById('projectDuration').value) || 30;
+            const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+            
+            const customNotesTextarea = document.getElementById('customNotes');
+            const notes = customNotesTextarea ? customNotesTextarea.value : (currentQuote.contactInfo.notes || "Standard aluminum work installation with professional finishing.");
+            
+            // Apply discount to totals
+            const originalTotal = pricingData.totals.totalAfter;
+            const discountAmount = (originalTotal * discountPercentage) / 100;
+            const discountedTotal = originalTotal - discountAmount;
+            
+            // Recalculate payment amounts based on discounted total
+            const downPayment = discountedTotal * 0.8;
+            const supplyPayment = discountedTotal * 0.1;
+            const completePayment = discountedTotal * 0.1;
+            
+            let html = `
+                <svg width="0" height="0">
+                    <defs>
+                        <linearGradient id="glassGradient" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#a9d4f4"/>
+                            <stop offset="100%" stop-color="#e6f2fb"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+
+                <div class="header">
+                    <img src="https://img1.wsimg.com/isteam/ip/b11b2784-66bc-4ac4-9b05-6ba6d416d22d/Untitled%20design%20(1).jpg" alt="Logo" class="logo" />
+                    <div class="title">Cocoon company for Aluminum Works</div>
+                </div>
+
+                <div class="info-block">
+                    <p><strong>Quote Date:</strong> ${quoteDate}</p>
+                    <p><strong>Customer Name:</strong> ${currentQuote.contactInfo.name || "Not Provided"}</p>
+                    <p><strong>Project:</strong> ${currentQuote.contactInfo.location || "Not Provided"}</p>
+                    <p><strong>Quote Reference:</strong> ${currentQuote.id}</p>
+                    <p>This is a price quotation for the listed aluminum works, based on the dimensions and system type provided.</p>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Width (m)</th>
+                            <th>Height (m)</th>
+                            <th>Quantity</th>
+                            <th>Area (m²)</th>
+                            <th>Specs</th>
+                            <th>System</th>
+                            <th>Icon</th>
+                            ${showDetailedPricing ? '<th>Price</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            pricingData.items.forEach((item, index) => {
+                const itemNo = index + 1;
+                let itemName = '';
+                let width = '';
+                let height = '';
+                let area = '';
+                let specs = '';
+                let system = '';
+                let icon = '';
+                
+                if (item.type === 'curtain_wall') {
+                    itemName = `${item.system || 'Curtain Wall'}${itemNo}`;
+                    width = (item.designData?.wallWidth || 0).toFixed(1);
+                    height = (item.designData?.wallHeight || 0).toFixed(1);
+                    area = (item.glassArea || 0).toFixed(2);
+                    specs = '<span class="tag glass-single">Tempered Double Glazed 6MM + 21.3 MM + Space + 6MM Clear Filled With Argon Gas</span>';
+                    system = item.profile?.profile_name || 'Curtain Wall System';
+                    
+                    // Fix SVG display for curtain wall items
+                    let svgContent = '';
+                    if (item.curtain?.visualSvg) {
+                        svgContent = item.curtain.visualSvg;
+                    } else if (item.visualSvg) {
+                        svgContent = item.visualSvg;
+                    } else if (item.designData?.visualSvg) {
+                        svgContent = item.designData.visualSvg;
+                    } else if (item.designData && item.designData.panels && item.designData.panels.length > 0) {
+                        svgContent = generateCurtainWallSvg(item.designData);
+                    }
+                    
+                    if (svgContent) {
+                        icon = `<div class="cw-export-inner" style="max-width: 100px; max-height: 60px; overflow: hidden;">${svgContent}</div>`;
+                    } else {
+                        icon = '<i class="fas fa-building" style="font-size: 24px; color: #A72036;"></i>';
+                    }
+                } else {
+                    itemName = item.system !== "Curtain Wall" ? 
+                        `${item.system} ${item.type}${itemNo}` : 
+                        `${item.system}${itemNo}`;
+                    width = (item.width || 0).toFixed(1);
+                    height = (item.height || 0).toFixed(1);
+                    area = (item.area || 0).toFixed(2);
+                    
+                    // Build specs
+                    let specsArray = [];
+                    if (item.system === "Curtain Wall") {
+                        specsArray.push('<span class="tag glass-single">Tempered Double Glazed 6MM + 21.3 MM + Space + 6MM Clear Filled With Argon Gas</span>');
+                    } else {
+                        if (item.glassType === "double") {
+                            specsArray.push('<span class="tag glass-double">Tempered Double Glazed 6MM + 6MM + Space + 6MM Clear Filled With Argon Gas</span>');
+                        } else {
+                            specsArray.push('<span class="tag glass-single">Tempered single Glazed 6MM</span>');
+                        }
+                    }
+                    
+                    if (item.mosquito) {
+                        specsArray.push('<span class="tag tag-net">Mosquito Net</span>');
+                    }
+                    if (item.arch) {
+                        specsArray.push('<span class="tag tag-arch">Arch Trave</span>');
+                    }
+                    
+                    specs = specsArray.join('');
+                    system = item.profile?.profile_name || item.system || 'Standard System';
+                    
+                    // Generate SVG for normal items if not available, otherwise use existing
+                    let svgContent = item.visualSvg;
+                    if (!svgContent && item.width && item.height) {
+                        svgContent = generateNormalItemSvg(item);
+                    }
+                    
+                    if (svgContent) {
+                        icon = `<div class="cw-export-inner" style="max-width: 100px; max-height: 60px; overflow: hidden;">${svgContent}</div>`;
+                    } else {
+                        // Fall back to Font Awesome icons if no SVG can be generated
+                        if (item.system === "Sliding") {
+                            if (item.leaves === 2) {
+                                icon = '<i class="fas fa-window-maximize" style="font-size: 24px; color: #800000;"></i>';
+                            } else if (item.leaves === 4) {
+                                icon = '<i class="fas fa-th-large" style="font-size: 28px; color: #800000;"></i>';
+                            } else if (item.leaves === 3) {
+                                icon = '<i class="fas fa-columns" style="font-size: 26px; color: #800000;"></i>';
+                            }
+                        } else if (item.system === "hinged") {
+                            if (item.leaves === 2) {
+                                icon = '<i class="fas fa-door-open" style="font-size: 24px; color: #800000;"></i>';
+                            } else if (item.leaves === 1) {
+                                icon = '<i class="fas fa-door-closed" style="font-size: 24px; color: #800000;"></i>';
+                            }
+                        } else if (item.system === "fixed" && item.leaves === 1) {
+                            icon = '<i class="fas fa-square" style="font-size: 24px; color: #800000;"></i>';
+                        } else {
+                            icon = '<i class="fas fa-window-restore" style="font-size: 24px; color: #800000;"></i>';
+                        }
+                    }
+                }
+                
+                html += `
+                    <tr>
+                        <td>${itemName}</td>
+                        <td>${width}</td>
+                        <td>${height}</td>
+                        <td>${item.quantity}</td>
+                        <td>${area}</td>
+                        <td>${specs}</td>
+                        <td>${system}</td>
+                        <td>${icon}</td>
+                        ${showDetailedPricing ? `<td><div class="currency-value">${formatNumberWithCommas(Math.round(item.totalPrice || 0))} EGP</div></td>` : ''}
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                
+                <div class="totals">
+                    <div>
+                        <div>Total Price</div>
+                        <div class="currency-value">${formatNumberWithCommas(Math.round(discountedTotal))} EGP</div>
+                    </div>
+                    <div> 
+                        <div>Total Area</div>
+                        <div class="currency-value">${pricingData.totals.totalM2.toFixed(2)} m²</div>
+                    </div>
+                    ${discountPercentage > 0 ? `
+                    <div>
+                        <div>Original Price</div>
+                        <div class="currency-value" style="text-decoration: line-through; color: #999;">${formatNumberWithCommas(Math.round(originalTotal))} EGP</div>
+                    </div>
+                    <div>
+                        <div>Discount (${discountPercentage}%)</div>
+                        <div class="currency-value" style="color: #28a745;">-${formatNumberWithCommas(Math.round(discountAmount))} EGP</div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="payment">
+                    <div>
+                        <div>Down Payment</div>
+                        <div class="currency-value">${formatNumberWithCommas(Math.round(downPayment))} EGP</div>
+                    </div>
+                    <div>
+                        <div>On items supply payment</div>
+                        <div class="currency-value">${formatNumberWithCommas(Math.round(supplyPayment))} EGP</div>
+                    </div>
+                    <div>
+                        <div>On Project Completion payment</div>
+                        <div class="currency-value">${formatNumberWithCommas(Math.round(completePayment))} EGP</div>
+                    </div>
+                </div>
+                
+                <div class="valid">
+                    <div>
+                        <div>Offer valid For</div>
+                        <div class="currency-value">${expirationDays} Days</div>
+                    </div>
+                    <div>
+                        <div>Project Duration</div>
+                        <div class="currency-value">${projectDuration} Days</div>
+                    </div>
+                </div>
+                
+                <div class="notes">
+                    <div class="notes-title">Special Notes</div>
+                    <p>${notes.replace(/\n/g, '<br>')}</p>
+                </div>
+                
+                <div class="footer">
+                    <div class="footer-title">Cocoon company for Aluminum Works</div>
+                    <p>61 Seventh Neighborhood, Fourth District, El-Shaikh Zayed, Giza</p>
+                    <p>Tel: +20 2 38501291 | +20 11 51717149</p>
+                    <p>Email: sales.department@cocoonaluminum.com</p>
+                    <p>Website: www.cocoonaluminum.com</p>
+                </div>
+            `;
+            
+            document.getElementById('quote-content').innerHTML = html;
+            
+            // Apply number formatting
+            document.querySelectorAll('.currency-value').forEach(el => {
+                const parts = el.textContent.split(' ');
+                if (parts.length > 0 && !isNaN(parts[0])) {
+                    parts[0] = formatNumberWithCommas(parts[0]);
+                    el.textContent = parts.join(' ');
+                }
+            });
+        }
+
+        // Export to PDF function
+        
+async function exportToPDF() {
+    const controls = document.querySelector('.export-controls');
+    if (controls) controls.style.display = 'none'; // hide controls while exporting
+
+    try {
+        // Wait for webfonts to load to avoid rendering issues
+        if (document.fonts && document.fonts.ready) {
+            try { await document.fonts.ready; } catch (e) {}
+        }
+
+        // Try to get quote ID directly from JS state if available
+        let quoteId = (typeof currentQuote !== 'undefined' && currentQuote && (currentQuote.id || currentQuote.quoteId)) ? String(currentQuote.id || currentQuote.quoteId) : null;
+
+        // If not available, try to grab it from the DOM inside #quote-content
+        if (!quoteId) {
+            const content = document.getElementById('quote-content');
+            if (content) {
+                // Look for paragraphs containing "Quote Reference", "Quote ID", or similar
+                const ps = content.querySelectorAll('p,div,span');
+                for (const p of ps) {
+                    const txt = (p.textContent || '').trim();
+                    if (/Quote\s*Reference|Quote\s*ID|Quote\s*#/i.test(txt)) {
+                        // split on colon when present
+                        let maybe = txt.split(':').slice(1).join(':').trim();
+                        if (!maybe) {
+                            // fallback: remove label words
+                            maybe = txt.replace(/.*Quote\s*(Reference|ID)?\s*#?:?\s*/i, '').trim();
+                        }
+                        if (maybe) {
+                            quoteId = maybe;
+                            break;
+                        }
+                    }
+                }
+
+                // As a last resort, use a header inside the content (h1/h2/h3) or element with class .quote-title
+                if (!quoteId) {
+                    const h = content.querySelector('.quote-title, #quote-id, h1, h2, h3');
+                    if (h) quoteId = (h.textContent || '').trim();
+                }
+            }
+        }
+
+        if (!quoteId) quoteId = 'quote-export';
+        // sanitize
+        quoteId = quoteId.replace(/[^a-z0-9-_]/gi, '_').substring(0, 120) || 'quote-export';
+
+        const element = document.getElementById('quote-content');
+        if (!element) {
+            alert('No quote content found to export.');
+            return;
+        }
+
+        // Create off-screen container and clone element to avoid exporting controls
+        // const container = document.createElement('div');
+        // container.id = 'tmp-html2pdf-container';
+        // container.style.position = 'fixed';
+        // container.style.left = '-10000px';
+        // container.style.top = '0';
+        // container.style.width = '794pt'; // A4 width in points approx
+        // container.style.background = '#fff';
+
+        // const clone = element.cloneNode(true);
+        // // Remove any export controls inside the clone just in case
+        // clone.querySelectorAll('.export-controls, .no-print').forEach(el => el.remove());
+        // Ensure images are CORS-friendly
+        // clone.querySelectorAll('img').forEach(img => { if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous'); });
+
+        // container.appendChild(clone);
+        // document.body.appendChild(container);
+
+        const opt = {
+            margin: [20, 20, 20, 20],
+            filename: `${quoteId}.pdf`,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
+        };
+
+        // Perform PDF generation and force download
+        await html2pdf().set(opt).from(element).save();
+    } catch (err) {
+        console.error('PDF export failed:', err);
+        alert('Sorry, PDF generation failed. Check console for details.');
+    } finally {
+        // cleanup
+        const tmp = document.getElementById('tmp-html2pdf-container');
+        if (tmp && tmp.parentNode) tmp.parentNode.removeChild(tmp);
+        if (controls) controls.style.display = 'block';
+    }
+}
+
+
+        // Print quote function
+        function printQuote() {
+            // Hide export controls
+            document.querySelector('.export-controls').style.display = 'none';
+            
+            // Print the page
+            window.print();
+            
+            // Show export controls again after print dialog
+            setTimeout(() => {
+                document.querySelector('.export-controls').style.display = 'block';
+            }, 1000);
+        }
+
+        // Email quote function
+        function emailQuote() {
+            if (!currentQuote) return;
+            
+            const expirationDays = parseInt(document.getElementById('expirationDays').value) || 3;
+            
+            const subject = `Quote: ${currentQuote.name}`;
+            const body = `Dear ${currentQuote.contactInfo.name},
+
+Please find your detailed quote for the aluminum work project.
+
+Quote Details:
+- Quote ID: ${currentQuote.id}
+- Project Type: ${currentQuote.projectType}
+- Items: ${currentQuote.items.length}
+- Location: ${currentQuote.contactInfo.location}
+
+This quote is valid for ${expirationDays} days from the date of issue.
+
+Best regards,
+Cocoon Aluminum Works
+Phone: +20 11 51717149
+Email: sales.department@cocoonaluminum.com
+Website: www.cocoonaluminum.com`;
+
+            const mailtoLink = `mailto:${currentQuote.contactInfo.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+        }
+
+        // Update quote when pricing type changes or notes are modified
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'pricingType') {
+                generateQuoteHTML();
+            }
+        });
+
+        // Update quote when notes are changed
+        document.addEventListener('input', function(e) {
+            if (e.target.id === 'customNotes') {
+                generateQuoteHTML();
+            }
+        });
+
+        // Update quote when quote settings are changed
+        document.addEventListener('input', function(e) {
+            if (e.target.id === 'expirationDays' || e.target.id === 'projectDuration' || e.target.id === 'discountPercentage') {
+                generateQuoteHTML();
+            }
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuoteData();
+        });
+
+        // ENHANCED FUNCTION: Generates SVG string for curtain wall with accurate ratio representation
+        function generateCurtainWallSvg(data) {
+            console.log('generateCurtainWallSvg called with data:', data);
+            if (!data || !data.panels) {
+                console.log('No data or panels found, returning error message');
+                return '<em>No design data available</em>';
+            }
+
+            // Fixed consistent dimensions for all SVGs
+            const fixedSvgWidth = 240;
+            const fixedSvgHeight = 160;
+            const padding = 15;
+            
+            // Filter panels to render (exclude merged children but include merged parents)
+            const panelsToRender = data.panels.filter(
+                panel => !panel.mergedId // Only show panels that aren't merged into another panel
+            );
+
+            if (panelsToRender.length === 0) {
+                return '<em>No panels to display</em>';
+            }
+
+            // Calculate the total wall dimensions from panel data
+            const totalWallWidth = data.wallWidth || 4.0;
+            const totalWallHeight = data.wallHeight || 3.0;
+
+            // Calculate available space for the curtain wall
+            const availableWidth = fixedSvgWidth - (padding * 2);
+            const availableHeight = fixedSvgHeight - (padding * 2);
+            
+            // Calculate consistent size for curtain walls
+            const baseMaxSize = Math.min(availableWidth, availableHeight) * 0.8; // 80% of available space
+            
+            // Adjust size based on number of panels
+            const panelCount = panelsToRender.length;
+            let panelMultiplier = 1;
+            if (panelCount > 1) {
+                // Scale up based on number of panels to show complexity
+                panelMultiplier = Math.min(panelCount * 0.2 + 0.8, 1.8); // Max 1.8x for very complex curtain walls
+            }
+            
+            const maxSize = baseMaxSize * panelMultiplier;
+            const wallRatio = totalWallWidth / totalWallHeight;
+            
+            let contentWidth, contentHeight;
+            if (wallRatio > 1) {
+                // Wide walls
+                contentWidth = maxSize;
+                contentHeight = maxSize / wallRatio;
+            } else {
+                // Tall walls
+                contentHeight = maxSize;
+                contentWidth = maxSize * wallRatio;
+            }
+            
+            // Center the content within the fixed SVG
+            const offsetX = (fixedSvgWidth - contentWidth) / 2;
+            const offsetY = (fixedSvgHeight - contentHeight) / 2;
+
+            // Generate unique ID for gradients
+            const gradientId = `glassGradient_${Math.random().toString(36).substr(2, 9)}`;
+            const reflectionId = `glassReflection_${Math.random().toString(36).substr(2, 9)}`;
+
+            // Panel colors and labels - Enhanced to match the image
+            const panelStyles = {
+                'structure': { color: '#e3f2fd', stroke: '#1976d2', label: 'F' },
+                'window': { color: `url(#${gradientId})`, stroke: '#42a5f5', label: '' },
+                'door': { color: '#ffecb3', stroke: '#ffca28', label: 'D' }
+            };
+
+            // Define gradients for glass effect
+            const gradientDefs = `
+                <defs>
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e3f2fd;stop-opacity:0.9" />
+                        <stop offset="25%" style="stop-color:#bbdefb;stop-opacity:0.7" />
+                        <stop offset="50%" style="stop-color:#90caf9;stop-opacity:0.5" />
+                        <stop offset="75%" style="stop-color:#64b5f6;stop-opacity:0.7" />
+                        <stop offset="100%" style="stop-color:#42a5f5;stop-opacity:0.9" />
+                    </linearGradient>
+                    <linearGradient id="${reflectionId}" x1="0%" y1="0%" x2="30%" y2="30%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.6" />
+                        <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+            `;
+
+            let svgContent = '';
+
+            // Render panels with accurate ratio representation
+            panelsToRender.forEach(panel => {
+                console.log('Processing panel:', panel);
+                const style = panelStyles[panel.type] || { color: '#f0f0f0', stroke: '#ddd', label: '' };
+                
+                // Use actual panel dimensions in meters to calculate SVG positions
+                const panelWidthMeters = panel.widthMeters || 0;
+                const panelHeightMeters = panel.heightMeters || 0;
+                
+                // Calculate panel position and size in SVG coordinates
+                // Fallback to grid-based positioning if left/top are not available
+                let panelX, panelY;
+                if (panel.left !== undefined && panel.top !== undefined) {
+                    panelX = offsetX + (panel.left / 100) * contentWidth;
+                    panelY = offsetY + (panel.top / 100) * contentHeight;
+                } else {
+                    // Fallback to grid-based positioning
+                    const gridCols = data.cols || 4;
+                    const gridRows = data.rows || 3;
+                    const cellWidth = contentWidth / gridCols;
+                    const cellHeight = contentHeight / gridRows;
+                    panelX = offsetX + (panel.col || 0) * cellWidth;
+                    panelY = offsetY + (panel.row || 0) * cellHeight;
+                }
+                
+                let panelWidth, panelHeight;
+                if (panelWidthMeters > 0 && panelHeightMeters > 0) {
+                    panelWidth = (panelWidthMeters / totalWallWidth) * contentWidth;
+                    panelHeight = (panelHeightMeters / totalWallHeight) * contentHeight;
+                } else {
+                    // Fallback to grid-based sizing
+                    const gridCols = data.cols || 4;
+                    const gridRows = data.rows || 3;
+                    const cellWidth = contentWidth / gridCols;
+                    const cellHeight = contentHeight / gridRows;
+                    panelWidth = cellWidth;
+                    panelHeight = cellHeight;
+                }
+
+                // Panel rectangle with rounded corners
+                svgContent += `
+                    <rect x="${panelX}" y="${panelY}" width="${panelWidth}" height="${panelHeight}"
+                          fill="${style.color}" stroke="black" stroke-width="3" rx="4" ry="4"/>
+                `;
+
+                // Special handling for windows with divided panels (matching the image)
+                if (panel.type === 'window') {
+                    // Add glass reflection effect
+                    svgContent += `
+                        <rect x="${panelX + 2}" y="${panelY + 2}" width="${panelWidth * 0.3}" height="${panelHeight * 0.4}"
+                              fill="url(#${reflectionId})" stroke="none" rx="2" ry="2"/>
+                    `;
+                    
+                    // Add window frame lines for larger panels (matching the divided panels in image)
+                    if (panelWidth > 20 && panelHeight > 20) {
+                        // Vertical center line
+                        svgContent += `
+                            <line x1="${panelX + panelWidth/2}" y1="${panelY}" x2="${panelX + panelWidth/2}" y2="${panelY + panelHeight}"
+                                  stroke="black" stroke-width="3" opacity="0.9"/>
+                        `;
+                        
+                        // Horizontal center line
+                        svgContent += `
+                            <line x1="${panelX}" y1="${panelY + panelHeight/2}" x2="${panelX + panelWidth}" y2="${panelY + panelHeight/2}"
+                                  stroke="black" stroke-width="3" opacity="0.9"/>
+                        `;
+                        
+                        // V-shape division - extends fully to panel edges
+                        const centerX = panelX + panelWidth / 2;
+                        const centerY = panelY + panelHeight / 2;
+                        svgContent += `
+                            <line x1="${panelX}" y1="${panelY}" x2="${centerX}" y2="${centerY}"
+                                  stroke="black" stroke-width="3" opacity="0.9"/>
+                            <line x1="${panelX + panelWidth}" y1="${panelY}" x2="${centerX}" y2="${centerY}"
+                                  stroke="black" stroke-width="3" opacity="0.9"/>
+                        `;
+                    }
+                }
+
+                // Panel label (for structure and door panels)
+                if (panel.type && panel.type !== 'window' && style.label) {
+                    const centerX = panelX + panelWidth / 2;
+                    const centerY = panelY + panelHeight / 2;
+                    const fontSize = Math.min(panelWidth, panelHeight) / 4;
+
+                    svgContent += `
+                        <text x="${centerX}" y="${centerY}" 
+                              font-family="Arial, sans-serif" font-size="${Math.max(fontSize, 10)}" 
+                              fill="${style.stroke}" text-anchor="middle" font-weight="bold"
+                              dominant-baseline="middle">
+                            ${style.label}
+                        </text>
+                    `;
+                }
+            });
+
+            // Outer border with rounded corners - represents the actual wall dimensions
+            svgContent = `
+                <rect x="${offsetX}" y="${offsetY}" width="${contentWidth}" height="${contentHeight}"
+                      fill="none" stroke="#A72036" stroke-width="2" rx="6" ry="6"/>
+                ${svgContent}
+            `;
+
+            const finalSvg = `
+                <svg width="${fixedSvgWidth}" height="${fixedSvgHeight}" 
+                     viewBox="0 0 ${fixedSvgWidth} ${fixedSvgHeight}" 
+                     xmlns="http://www.w3.org/2000/svg">
+                    ${gradientDefs}
+                    ${svgContent}
+                </svg>
+            `;
+            
+            console.log('Generated final SVG, length:', finalSvg.length);
+            return finalSvg;
+        }
+
+        // ENHANCED FUNCTION: Generates SVG string for normal items with proper system representation
+        function generateNormalItemSvg(item) {
+            console.log('Export - generateNormalItemSvg called with item:', item);
+            console.log('Export - Item system:', item.system, 'leaves:', item.leaves, 'upperPanelType:', item.upperPanelType);
+            if (!item || !item.width || !item.height) {
+                console.log('No item data or dimensions found, returning error message');
+                return '<em>No item data available</em>';
+            }
+
+            // Fixed consistent dimensions for all SVGs
+            const fixedSvgWidth = 240;
+            const fixedSvgHeight = 160;
+            const padding = 20;
+            
+            // Calculate consistent size for all items
+            const availableWidth = fixedSvgWidth - (padding * 2);
+            const availableHeight = fixedSvgHeight - (padding * 2);
+            
+            // Adjust size based on number of leaves
+            let leafMultiplier = 1;
+            if (item.leaves > 1) {
+                // Scale up based on number of leaves to show complexity
+                leafMultiplier = Math.min(item.leaves * 0.3 + 0.7, 1.5); // Max 1.5x for very complex items
+            }
+            
+            // Use consistent size for all items (maintain aspect ratio within bounds)
+            const baseMaxSize = Math.min(availableWidth, availableHeight) * 0.8; // 80% of available space
+            const maxSize = baseMaxSize * leafMultiplier;
+            const itemRatio = item.width / item.height;
+            
+            let contentWidth, contentHeight;
+            if (itemRatio > 1) {
+                // Wide items
+                contentWidth = maxSize;
+                contentHeight = maxSize / itemRatio;
+            } else {
+                // Tall items
+                contentHeight = maxSize;
+                contentWidth = maxSize * itemRatio;
+            }
+            
+            // Center the content within the fixed SVG
+            const offsetX = (fixedSvgWidth - contentWidth) / 2;
+            const offsetY = (fixedSvgHeight - contentHeight) / 2;
+
+            // Generate unique ID for gradients
+            const gradientId = `glassGradient_${Math.random().toString(36).substr(2, 9)}`;
+            const reflectionId = `glassReflection_${Math.random().toString(36).substr(2, 9)}`;
+
+            // Item colors and labels based on type
+            const itemStyles = {
+                'window': { 
+                    color: `url(#${gradientId})`, 
+                    stroke: '#42a5f5', 
+                    label: 'W',
+                    frameColor: '#1976d2'
+                },
+                'door': { 
+                    color: '#ffecb3', 
+                    stroke: '#ffca28', 
+                    label: 'D',
+                    frameColor: '#f57c00'
+                },
+                'sliding_door': { 
+                    color: '#e8f5e8', 
+                    stroke: '#4caf50', 
+                    label: 'S',
+                    frameColor: '#2e7d32'
+                }
+            };
+
+            const style = itemStyles[item.type] || itemStyles['window'];
+
+            // Define gradients for glass effect
+            const gradientDefs = `
+                <defs>
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e3f2fd;stop-opacity:0.9" />
+                        <stop offset="25%" style="stop-color:#bbdefb;stop-opacity:0.7" />
+                        <stop offset="50%" style="stop-color:#90caf9;stop-opacity:0.5" />
+                        <stop offset="75%" style="stop-color:#64b5f6;stop-opacity:0.7" />
+                        <stop offset="100%" style="stop-color:#42a5f5;stop-opacity:0.9" />
+                    </linearGradient>
+                    <linearGradient id="${reflectionId}" x1="0%" y1="0%" x2="30%" y2="30%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.6" />
+                        <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+            `;
+
+            let svgContent = '';
+
+            // Handle different system types with appropriate layouts
+            if (item.system === 'Sliding') {
+                // Sliding system: panels side by side with arrows
+                svgContent += `
+                    <rect x="${offsetX}" y="${offsetY}" width="${contentWidth}" height="${contentHeight}"
+                          fill="${style.color}" stroke="black" stroke-width="3" rx="6" ry="6"/>
+                `;
+
+                // Add glass reflection effect
+                svgContent += `
+                    <rect x="${offsetX + 4}" y="${offsetY + 4}" width="${contentWidth * 0.3}" height="${contentHeight * 0.4}"
+                          fill="url(#${reflectionId})" stroke="none" rx="3" ry="3"/>
+                `;
+
+                // Add frame divisions for leaves (side by side)
+                if (item.leaves > 1) {
+                    const leafWidth = contentWidth / item.leaves;
+                    for (let i = 1; i < item.leaves; i++) {
+                        const x = offsetX + (i * leafWidth);
+                        svgContent += `
+                            <line x1="${x}" y1="${offsetY}" x2="${x}" y2="${offsetY + contentHeight}"
+                                  stroke="black" stroke-width="3" opacity="0.9"/>
+                        `;
+                    }
+                }
+
+                // Add sliding arrows for each leaf
+                const arrowSize = Math.min(contentWidth, contentHeight) * 0.12;
+                const leafWidth = contentWidth / item.leaves;
+                
+                for (let i = 0; i < item.leaves; i++) {
+                    const leafCenterX = offsetX + (i * leafWidth) + (leafWidth / 2);
+                    const arrowY = offsetY + contentHeight / 2;
+                    
+                    // Left arrow (pointing right) - positioned at left edge of each leaf
+                    const leftArrowX = offsetX + (i * leafWidth) + (leafWidth * 0.25);
+                    svgContent += `
+                        <polygon points="${leftArrowX - arrowSize/2},${arrowY - arrowSize/2} ${leftArrowX + arrowSize/2},${arrowY} ${leftArrowX - arrowSize/2},${arrowY + arrowSize/2}"
+                                  fill="black" opacity="0.9"/>
+                    `;
+                    
+                    // Right arrow (pointing left) - positioned at right edge of each leaf
+                    const rightArrowX = offsetX + (i * leafWidth) + (leafWidth * 0.75);
+                    svgContent += `
+                        <polygon points="${rightArrowX + arrowSize/2},${arrowY - arrowSize/2} ${rightArrowX - arrowSize/2},${arrowY} ${rightArrowX + arrowSize/2},${arrowY + arrowSize/2}"
+                                  fill="black" opacity="0.9"/>
+                    `;
+                }
+
+            } else if (item.system === 'hinged') {
+                // Hinged system: panels stacked vertically with triangle shapes
+                const panelHeight = contentHeight / item.leaves;
+                
+                // Get upper panel type for 2-leaf hinged systems
+                let upperPanelType = 'hinged'; // default
+                if (item.leaves === 2) {
+                    // Use the stored upperPanelType property from the item data
+                    upperPanelType = item.upperPanelType || 'hinged';
+                    console.log('Export - Item upperPanelType:', item.upperPanelType, 'Using:', upperPanelType);
+                }
+                
+                for (let i = 0; i < item.leaves; i++) {
+                    const panelY = offsetY + (i * panelHeight);
+                    const isUpperPanel = i === 0; // First panel (top) is upper panel
+                    
+                    // Panel rectangle
+                    svgContent += `
+                        <rect x="${offsetX}" y="${panelY}" width="${contentWidth}" height="${panelHeight}"
+                              fill="${style.color}" stroke="black" stroke-width="3" rx="4" ry="4"/>
+                    `;
+                    
+                    // Add glass reflection effect
+                    svgContent += `
+                        <rect x="${offsetX + 2}" y="${panelY + 2}" width="${contentWidth * 0.3}" height="${panelHeight * 0.4}"
+                              fill="url(#${reflectionId})" stroke="none" rx="2" ry="2"/>
+                    `;
+                    
+                    // Add visual indicator based on panel type
+                    if (contentWidth > 30 && panelHeight > 20) {
+                        const centerX = offsetX + contentWidth / 2;
+                        const centerY = panelY + panelHeight / 2;
+                        
+                        if (isUpperPanel && item.leaves === 2 && upperPanelType === 'fixed') {
+                            // Upper panel is fixed - show F character
+                            console.log('Export - Rendering F character for fixed upper panel');
+                            const fontSize = Math.min(contentWidth, panelHeight) / 4;
+                            svgContent += `
+                                <text x="${centerX}" y="${centerY}" 
+                                      font-family="Arial, sans-serif" font-size="${Math.max(fontSize, 16)}" 
+                                      fill="black" text-anchor="middle" font-weight="bold"
+                                      dominant-baseline="middle">
+                                    F
+                                </text>
+                            `;
+                        } else {
+                            // Hinged panel - show V-shape
+                            console.log('Export - Rendering V-shape for hinged panel');
+                            svgContent += `
+                                <line x1="${offsetX}" y1="${panelY}" x2="${centerX}" y2="${centerY}"
+                                      stroke="black" stroke-width="3" opacity="0.9"/>
+                                <line x1="${offsetX + contentWidth}" y1="${panelY}" x2="${centerX}" y2="${centerY}"
+                                      stroke="black" stroke-width="3" opacity="0.9"/>
+                            `;
+                        }
+                    }
+                }
+
+            } else if (item.system === 'fixed') {
+                // Fixed system: multiple panels stacked vertically with F character on each
+                const panelHeight = contentHeight / item.leaves;
+                
+                for (let i = 0; i < item.leaves; i++) {
+                    const panelY = offsetY + (i * panelHeight);
+                    
+                    // Panel rectangle
+                    svgContent += `
+                        <rect x="${offsetX}" y="${panelY}" width="${contentWidth}" height="${panelHeight}"
+                              fill="${style.color}" stroke="black" stroke-width="3" rx="4" ry="4"/>
+                    `;
+                    
+                    // Add glass reflection effect
+                    svgContent += `
+                        <rect x="${offsetX + 2}" y="${panelY + 2}" width="${contentWidth * 0.3}" height="${panelHeight * 0.4}"
+                              fill="url(#${reflectionId})" stroke="none" rx="2" ry="2"/>
+                    `;
+                    
+                    // Add F character for each fixed panel
+                    if (contentWidth > 30 && panelHeight > 20) {
+                        const centerX = offsetX + contentWidth / 2;
+                        const centerY = panelY + panelHeight / 2;
+                        const fontSize = Math.min(contentWidth, panelHeight) / 4;
+
+                        svgContent += `
+                            <text x="${centerX}" y="${centerY}" 
+                                  font-family="Arial, sans-serif" font-size="${Math.max(fontSize, 16)}" 
+                                  fill="black" text-anchor="middle" font-weight="bold"
+                                  dominant-baseline="middle">
+                                F
+                            </text>
+                        `;
+                    }
+                }
+            } else {
+                // Default layout for other systems
+                svgContent += `
+                    <rect x="${offsetX}" y="${offsetY}" width="${contentWidth}" height="${contentHeight}"
+                          fill="${style.color}" stroke="black" stroke-width="3" rx="6" ry="6"/>
+                `;
+
+                // Add glass reflection effect
+                svgContent += `
+                    <rect x="${offsetX + 4}" y="${offsetY + 4}" width="${contentWidth * 0.3}" height="${contentHeight * 0.4}"
+                          fill="url(#${reflectionId})" stroke="none" rx="3" ry="3"/>
+                `;
+
+                // Add frame details based on leaves
+                if (item.leaves > 1) {
+                    const leafWidth = contentWidth / item.leaves;
+                    for (let i = 1; i < item.leaves; i++) {
+                        const x = offsetX + (i * leafWidth);
+                        svgContent += `
+                            <line x1="${x}" y1="${offsetY}" x2="${x}" y2="${offsetY + contentHeight}"
+                                  stroke="black" stroke-width="3" opacity="0.9"/>
+                        `;
+                    }
+                }
+            }
+
+            // Add item label (only for doors and sliding doors, not windows or fixed items)
+            if (item.system !== 'fixed' && item.type !== 'window') {
+                const centerX = offsetX + contentWidth / 2;
+                const centerY = offsetY + contentHeight / 2;
+                const fontSize = Math.min(contentWidth, contentHeight) / 6;
+
+                svgContent += `
+                    <text x="${centerX}" y="${centerY}" 
+                          font-family="Arial, sans-serif" font-size="${Math.max(fontSize, 16)}" 
+                          fill="${style.stroke}" text-anchor="middle" font-weight="bold"
+                          dominant-baseline="middle">
+                        ${style.label}
+                    </text>
+                `;
+            }
+
+            // Add dimensions text
+            const centerX = offsetX + contentWidth / 2;
+            const dimText = `${item.width}m × ${item.height}m`;
+            const dimFontSize = Math.max(Math.min(contentWidth, contentHeight) / 12, 10);
+            
+            svgContent += `
+                <text x="${centerX}" y="${offsetY + contentHeight + dimFontSize + 5}" 
+                      font-family="Arial, sans-serif" font-size="${dimFontSize}" 
+                      fill="#666" text-anchor="middle" font-weight="normal"
+                      dominant-baseline="middle">
+                    ${dimText}
+                </text>
+            `;
+
+            const finalSvg = `
+                <svg width="${fixedSvgWidth}" height="${fixedSvgHeight}" 
+                     viewBox="0 0 ${fixedSvgWidth} ${fixedSvgHeight}" 
+                     xmlns="http://www.w3.org/2000/svg">
+                    ${gradientDefs}
+                    ${svgContent}
+                </svg>
+            `;
+            
+            console.log('Generated final normal item SVG, length:', finalSvg.length);
+            return finalSvg;
+        }
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script><script src="export.js"></script></body>
+</html>

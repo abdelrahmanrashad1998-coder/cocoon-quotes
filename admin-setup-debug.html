@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Setup Debug - Cocoon Aluminum Works</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    
+    <style>
+        :root {
+            --cocoon-primary: #A72036;
+            --cocoon-dark: #303038;
+            --cocoon-light: #F9BC77;
+            --cocoon-white: #FFFFFF;
+            --cocoon-light-bg: #f8f8f8;
+        }
+        
+        body {
+            background-color: var(--cocoon-light-bg);
+            color: var(--cocoon-dark);
+            font-family: "Montserrat", sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--cocoon-white);
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        h1 {
+            color: var(--cocoon-primary);
+            margin: 0;
+        }
+        
+        .debug-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .debug-section h3 {
+            color: var(--cocoon-primary);
+            margin-top: 0;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--cocoon-primary);
+            color: var(--cocoon-white);
+        }
+        
+        .btn-primary:hover {
+            background: #8a1a2c;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: var(--cocoon-white);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: var(--cocoon-white);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: var(--cocoon-white);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            border-color: var(--cocoon-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(167, 32, 54, 0.2);
+        }
+        
+        .log-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .user-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        
+        .user-email {
+            font-weight: 600;
+            color: var(--cocoon-primary);
+        }
+        
+        .user-role {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        
+        .role-admin {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .role-user {
+            background: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-tools"></i> Admin Setup & Debug</h1>
+            <p>Debug authentication and set up admin users</p>
+        </div>
+        
+        <div id="status-message"></div>
+        
+        <!-- Authentication Status -->
+        <div class="debug-section">
+            <h3><i class="fas fa-user-check"></i> Authentication Status</h3>
+            <div id="auth-status">Loading...</div>
+            <button class="btn btn-secondary" onclick="checkAuthStatus()">
+                <i class="fas fa-refresh"></i> Refresh Status
+            </button>
+        </div>
+        
+        <!-- Current User Info -->
+        <div class="debug-section">
+            <h3><i class="fas fa-user"></i> Current User Information</h3>
+            <div id="user-info">Loading...</div>
+            <button class="btn btn-secondary" onclick="checkUserInfo()">
+                <i class="fas fa-info-circle"></i> Check User Info
+            </button>
+        </div>
+        
+        <!-- Make User Admin -->
+        <div class="debug-section">
+            <h3><i class="fas fa-crown"></i> Make User Admin</h3>
+            <div class="form-group">
+                <label for="admin-email">User Email:</label>
+                <input type="email" id="admin-email" class="form-control" placeholder="Enter user email">
+            </div>
+            <button class="btn btn-primary" onclick="makeUserAdmin()">
+                <i class="fas fa-crown"></i> Make Admin
+            </button>
+            <button class="btn btn-success" onclick="makeCurrentUserAdmin()">
+                <i class="fas fa-user-crown"></i> Make Current User Admin
+            </button>
+        </div>
+        
+        <!-- All Users -->
+        <div class="debug-section">
+            <h3><i class="fas fa-users"></i> All Users</h3>
+            <button class="btn btn-secondary" onclick="loadAllUsers()">
+                <i class="fas fa-sync"></i> Load Users
+            </button>
+            <div id="users-list">Click "Load Users" to see all users</div>
+        </div>
+        
+        <!-- Debug Log -->
+        <div class="debug-section">
+            <h3><i class="fas fa-bug"></i> Debug Log</h3>
+            <button class="btn btn-secondary" onclick="clearLog()">
+                <i class="fas fa-trash"></i> Clear Log
+            </button>
+            <div id="debug-log" class="log-output">Debug log will appear here...</div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="debug-section">
+            <h3><i class="fas fa-compass"></i> Navigation</h3>
+            <a href="dashboard.html" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="admin.html" class="btn btn-success">
+                <i class="fas fa-users-cog"></i> User Management
+            </a>
+            <a href="index.html" class="btn btn-secondary">
+                <i class="fas fa-sign-in-alt"></i> Login Page
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let debugLog = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            log('Admin Setup Debug page loaded');
+            
+            // Initialize Firebase Auth
+            try {
+                await FirebaseAuth.initializeAuth();
+                log('Firebase Auth initialized');
+            } catch (error) {
+                log('Error initializing Firebase Auth: ' + error.message, 'error');
+            }
+            
+            // Check initial status
+            await checkAuthStatus();
+            await checkUserInfo();
+        });
+
+        // Log function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            debugLog.push(logEntry);
+            
+            const logElement = document.getElementById('debug-log');
+            logElement.textContent = debugLog.join('\n');
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(logEntry);
+        }
+
+        // Clear log
+        function clearLog() {
+            debugLog = [];
+            document.getElementById('debug-log').textContent = 'Debug log cleared...';
+        }
+
+        // Check authentication status
+        async function checkAuthStatus() {
+            const statusElement = document.getElementById('auth-status');
+            
+            try {
+                const isAuthenticated = FirebaseAuth.isAuthenticated();
+                const currentUser = FirebaseAuth.getCurrentUser();
+                
+                let statusHtml = `
+                    <div class="status ${isAuthenticated ? 'success' : 'error'}">
+                        <strong>Authentication:</strong> ${isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
+                    </div>
+                `;
+                
+                if (currentUser) {
+                    statusHtml += `
+                        <div class="status info">
+                            <strong>User:</strong> ${currentUser.email}<br>
+                            <strong>UID:</strong> ${currentUser.uid}
+                        </div>
+                    `;
+                }
+                
+                statusElement.innerHTML = statusHtml;
+                log(`Auth status checked: ${isAuthenticated ? 'Authenticated' : 'Not Authenticated'}`);
+                
+            } catch (error) {
+                statusElement.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+                log('Error checking auth status: ' + error.message, 'error');
+            }
+        }
+
+        // Check user info
+        async function checkUserInfo() {
+            const infoElement = document.getElementById('user-info');
+            
+            try {
+                const currentUser = FirebaseAuth.getCurrentUser();
+                
+                if (!currentUser) {
+                    infoElement.innerHTML = '<div class="status error">No authenticated user</div>';
+                    return;
+                }
+                
+                let userRole = 'user';
+                let userData = null;
+                
+                // Try to get user data from Firestore
+                if (typeof db !== 'undefined') {
+                    try {
+                        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                        if (userDoc.exists) {
+                            userData = userDoc.data();
+                            userRole = userData.role || 'user';
+                        }
+                    } catch (error) {
+                        log('Error fetching user data: ' + error.message, 'error');
+                    }
+                }
+                
+                let infoHtml = `
+                    <div class="status info">
+                        <strong>Email:</strong> ${currentUser.email}<br>
+                        <strong>UID:</strong> ${currentUser.uid}<br>
+                        <strong>Role:</strong> <span class="user-role role-${userRole}">${userRole}</span><br>
+                        <strong>Display Name:</strong> ${currentUser.displayName || 'Not set'}
+                    </div>
+                `;
+                
+                if (userData) {
+                    infoHtml += `
+                        <div class="status info">
+                            <strong>Created:</strong> ${userData.createdAt ? new Date(userData.createdAt).toLocaleString() : 'Unknown'}<br>
+                            <strong>Last Login:</strong> ${userData.lastLogin ? new Date(userData.lastLogin).toLocaleString() : 'Unknown'}<br>
+                            <strong>Active:</strong> ${userData.isActive ? 'Yes' : 'No'}
+                        </div>
+                    `;
+                }
+                
+                infoElement.innerHTML = infoHtml;
+                log(`User info checked: ${currentUser.email} (${userRole})`);
+                
+            } catch (error) {
+                infoElement.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+                log('Error checking user info: ' + error.message, 'error');
+            }
+        }
+
+        // Make user admin
+        async function makeUserAdmin() {
+            const email = document.getElementById('admin-email').value.trim();
+            
+            if (!email) {
+                showStatus('Please enter an email address', 'error');
+                return;
+            }
+            
+            try {
+                log(`Attempting to make ${email} admin...`);
+                
+                // Find user by email
+                const usersSnapshot = await db.collection('users').where('email', '==', email).get();
+                
+                if (usersSnapshot.empty) {
+                    showStatus(`No user found with email: ${email}`, 'error');
+                    log(`No user found with email: ${email}`, 'error');
+                    return;
+                }
+                
+                const userDoc = usersSnapshot.docs[0];
+                await db.collection('users').doc(userDoc.id).update({
+                    role: 'admin',
+                    lastModified: new Date().toISOString()
+                });
+                
+                showStatus(`User ${email} is now admin!`, 'success');
+                log(`Successfully made ${email} admin`);
+                
+                // Refresh user list
+                await loadAllUsers();
+                
+            } catch (error) {
+                showStatus('Error making user admin: ' + error.message, 'error');
+                log('Error making user admin: ' + error.message, 'error');
+            }
+        }
+
+        // Make current user admin
+        async function makeCurrentUserAdmin() {
+            try {
+                const currentUser = FirebaseAuth.getCurrentUser();
+                
+                if (!currentUser) {
+                    showStatus('No authenticated user', 'error');
+                    return;
+                }
+                
+                log(`Making current user (${currentUser.email}) admin...`);
+                
+                await db.collection('users').doc(currentUser.uid).update({
+                    role: 'admin',
+                    lastModified: new Date().toISOString()
+                });
+                
+                showStatus(`Current user ${currentUser.email} is now admin!`, 'success');
+                log(`Successfully made current user admin`);
+                
+                // Refresh user info
+                await checkUserInfo();
+                await loadAllUsers();
+                
+            } catch (error) {
+                showStatus('Error making current user admin: ' + error.message, 'error');
+                log('Error making current user admin: ' + error.message, 'error');
+            }
+        }
+
+        // Load all users
+        async function loadAllUsers() {
+            const listElement = document.getElementById('users-list');
+            
+            try {
+                log('Loading all users...');
+                
+                const usersSnapshot = await db.collection('users').get();
+                const users = [];
+                
+                usersSnapshot.forEach(doc => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+                
+                if (users.length === 0) {
+                    listElement.innerHTML = '<div class="status info">No users found</div>';
+                    log('No users found in database');
+                    return;
+                }
+                
+                const usersHtml = users.map(user => `
+                    <div class="user-card">
+                        <div class="user-email">${user.email}</div>
+                        <div class="user-role role-${user.role || 'user'}">${user.role || 'user'}</div>
+                        <small>Created: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</small>
+                    </div>
+                `).join('');
+                
+                listElement.innerHTML = `<div class="user-list">${usersHtml}</div>`;
+                log(`Loaded ${users.length} users`);
+                
+            } catch (error) {
+                listElement.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+                log('Error loading users: ' + error.message, 'error');
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusElement = document.getElementById('status-message');
+            statusElement.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusElement.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

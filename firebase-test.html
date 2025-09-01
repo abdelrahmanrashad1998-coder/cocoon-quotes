@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Firebase Configuration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .config-display {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Your Firebase config -->
+    <script src="config.js"></script>
+</head>
+<body>
+    <h1>🔥 Firebase Configuration Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Configuration Check</h2>
+        <div id="config-status">Checking configuration...</div>
+        <div id="config-details" class="config-display" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔗 Connection Tests</h2>
+        <button class="btn" onclick="testFirebaseInit()">Test Firebase Initialization</button>
+        <button class="btn" onclick="testFirestore()">Test Firestore Connection</button>
+        <button class="btn" onclick="testAuth()">Test Authentication</button>
+        <button class="btn" onclick="testUserCreation()">Test User Creation</button>
+        <div id="connection-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📝 Test Log</h2>
+        <div id="log" class="log"></div>
+        <button class="btn" onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Quick Fixes</h2>
+        <button class="btn" onclick="resetFirebase()">Reset Firebase</button>
+        <button class="btn" onclick="showConfig()">Show Current Config</button>
+        <button class="btn" onclick="openFirebaseConsole()">Open Firebase Console</button>
+    </div>
+
+    <script>
+        let logElement;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            logElement = document.getElementById('log');
+            log('Firebase Test Page Loaded');
+            checkConfiguration();
+        });
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.textContent += logEntry;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            logElement.textContent = '';
+        }
+        
+        function checkConfiguration() {
+            const configStatus = document.getElementById('config-status');
+            const configDetails = document.getElementById('config-details');
+            
+            try {
+                if (typeof firebase === 'undefined') {
+                    configStatus.innerHTML = '<div class="error">❌ Firebase SDK not loaded</div>';
+                    log('ERROR: Firebase SDK not loaded');
+                    return;
+                }
+                
+                if (!firebase.apps.length) {
+                    configStatus.innerHTML = '<div class="error">❌ Firebase not initialized</div>';
+                    log('ERROR: Firebase not initialized');
+                    return;
+                }
+                
+                const app = firebase.app();
+                const config = app.options;
+                
+                configStatus.innerHTML = '<div class="success">✅ Firebase initialized successfully</div>';
+                log('SUCCESS: Firebase initialized');
+                
+                // Show configuration details
+                configDetails.style.display = 'block';
+                configDetails.innerHTML = `
+Project ID: ${config.projectId || 'Not set'}
+Auth Domain: ${config.authDomain || 'Not set'}
+API Key: ${config.apiKey ? 'Set' : 'Not set'}
+Storage Bucket: ${config.storageBucket || 'Not set'}
+Messaging Sender ID: ${config.messagingSenderId || 'Not set'}
+App ID: ${config.appId || 'Not set'}
+                `;
+                
+                log(`Project ID: ${config.projectId}`);
+                log(`Auth Domain: ${config.authDomain}`);
+                
+            } catch (error) {
+                configStatus.innerHTML = `<div class="error">❌ Configuration Error: ${error.message}</div>`;
+                log(`ERROR: Configuration check failed - ${error.message}`);
+            }
+        }
+        
+        async function testFirebaseInit() {
+            log('Testing Firebase initialization...');
+            const results = document.getElementById('connection-results');
+            
+            try {
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK not loaded');
+                }
+                
+                if (!firebase.apps.length) {
+                    throw new Error('Firebase not initialized');
+                }
+                
+                const app = firebase.app();
+                log(`SUCCESS: Firebase initialized with project: ${app.options.projectId}`);
+                results.innerHTML = '<div class="success">✅ Firebase initialization successful</div>';
+                
+            } catch (error) {
+                log(`ERROR: Firebase initialization failed - ${error.message}`);
+                results.innerHTML = `<div class="error">❌ Firebase initialization failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testFirestore() {
+            log('Testing Firestore connection...');
+            const results = document.getElementById('connection-results');
+            
+            try {
+                const db = firebase.firestore();
+                const testDoc = await db.collection('test').doc('connection-test').get();
+                log('SUCCESS: Firestore connection successful');
+                results.innerHTML = '<div class="success">✅ Firestore connection successful</div>';
+                
+            } catch (error) {
+                log(`ERROR: Firestore connection failed - ${error.message}`);
+                results.innerHTML = `<div class="error">❌ Firestore connection failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testAuth() {
+            log('Testing Authentication service...');
+            const results = document.getElementById('connection-results');
+            
+            try {
+                const auth = firebase.auth();
+                log('SUCCESS: Authentication service available');
+                results.innerHTML = '<div class="success">✅ Authentication service available</div>';
+                
+            } catch (error) {
+                log(`ERROR: Authentication service failed - ${error.message}`);
+                results.innerHTML = `<div class="error">❌ Authentication service failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testUserCreation() {
+            log('Testing user creation...');
+            const results = document.getElementById('connection-results');
+            
+            try {
+                const testEmail = `test-${Date.now()}@example.com`;
+                const testPassword = 'testpassword123';
+                
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(testEmail, testPassword);
+                log(`SUCCESS: Test user created: ${userCredential.user.email}`);
+                
+                // Clean up - delete the test user
+                await userCredential.user.delete();
+                log('SUCCESS: Test user cleaned up');
+                
+                results.innerHTML = '<div class="success">✅ User creation test successful</div>';
+                
+            } catch (error) {
+                log(`ERROR: User creation test failed - ${error.message}`);
+                results.innerHTML = `<div class="error">❌ User creation test failed: ${error.message}</div>`;
+                
+                if (error.code === 'auth/configuration-not-found') {
+                    results.innerHTML += '<div class="warning">⚠️ This usually means Authentication is not enabled in Firebase Console</div>';
+                }
+            }
+        }
+        
+        function resetFirebase() {
+            log('Resetting Firebase...');
+            try {
+                if (firebase.apps.length) {
+                    firebase.app().delete();
+                    log('SUCCESS: Firebase reset');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
+            } catch (error) {
+                log(`ERROR: Firebase reset failed - ${error.message}`);
+            }
+        }
+        
+        function showConfig() {
+            try {
+                const app = firebase.app();
+                const config = app.options;
+                log('Current Firebase Configuration:');
+                log(JSON.stringify(config, null, 2));
+            } catch (error) {
+                log(`ERROR: Could not show config - ${error.message}`);
+            }
+        }
+        
+        function openFirebaseConsole() {
+            try {
+                const app = firebase.app();
+                const projectId = app.options.projectId;
+                const url = `https://console.firebase.google.com/project/${projectId}`;
+                window.open(url, '_blank');
+                log(`Opening Firebase Console for project: ${projectId}`);
+            } catch (error) {
+                log(`ERROR: Could not open Firebase Console - ${error.message}`);
+            }
+        }
+        
+        // Auto-run basic tests
+        setTimeout(() => {
+            testFirebaseInit();
+        }, 1000);
+    </script>
+</body>
+</html>
+
